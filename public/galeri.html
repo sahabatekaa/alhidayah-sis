@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galeri - Yayasan Al-Hidayah Amansari</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Header Placeholder -->
+    <div id="header-placeholder"></div>
+
+    <main>
+        <!-- HEADER HALAMAN -->
+        <section class="page-header gallery-header">
+            <div class="header-content">
+                <h1>Galeri & Dokumentasi</h1>
+                <p>Momen berharga, kegiatan belajar, dan prestasi siswa-siswi Yayasan Al-Hidayah Amansari.</p>
+            </div>
+        </section>
+
+        <section class="section-container">
+            
+            <!-- FILTER KATEGORI -->
+            <div class="gallery-filter-container">
+                <button class="filter-btn active" data-filter="all">Semua Foto</button>
+                <button class="filter-btn" data-filter="paud">Kegiatan PAUD</button>
+                <button class="filter-btn" data-filter="sdit">Kegiatan SD IT</button>
+                <button class="filter-btn" data-filter="fasilitas">Fasilitas</button>
+            </div>
+
+            <!-- GRID GALERI -->
+            <div class="gallery-masonry-grid" id="gallery-container">
+                
+                <!-- Item 1 (Kategori: PAUD) -->
+                <div class="gallery-item-wrap" data-category="paud">
+                    <div class="gallery-item">
+                        <img src="https://picsum.photos/600/600?random=101" alt="Kegiatan Belajar PAUD">
+                        <div class="gallery-overlay">
+                            <span class="gallery-tag">PAUD</span>
+                            <h3 class="gallery-caption">Belajar Mewarnai Bersama</h3>
+                            <button class="zoom-btn"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 2 (Kategori: SDIT) -->
+                <div class="gallery-item-wrap" data-category="sdit">
+                    <div class="gallery-item">
+                        <img src="https://picsum.photos/600/400?random=102" alt="Sholat Berjamaah SD IT">
+                        <div class="gallery-overlay">
+                            <span class="gallery-tag gold">SD IT</span>
+                            <h3 class="gallery-caption">Pembiasaan Sholat Dhuha</h3>
+                            <button class="zoom-btn"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 3 (Kategori: SDIT) -->
+                <div class="gallery-item-wrap" data-category="sdit">
+                    <div class="gallery-item">
+                        <img src="https://picsum.photos/600/800?random=103" alt="Pramuka SIT">
+                        <div class="gallery-overlay">
+                            <span class="gallery-tag gold">SD IT</span>
+                            <h3 class="gallery-caption">Kegiatan Pramuka SIT</h3>
+                            <button class="zoom-btn"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 4 (Kategori: Fasilitas) -->
+                <div class="gallery-item-wrap" data-category="fasilitas">
+                    <div class="gallery-item">
+                        <img src="https://picsum.photos/600/450?random=104" alt="Gedung Sekolah">
+                        <div class="gallery-overlay">
+                            <span class="gallery-tag blue">Fasilitas</span>
+                            <h3 class="gallery-caption">Gedung Utama Yayasan</h3>
+                            <button class="zoom-btn"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 5 (Kategori: PAUD) -->
+                <div class="gallery-item-wrap" data-category="paud">
+                    <div class="gallery-item">
+                        <img src="https://picsum.photos/600/500?random=105" alt="Bermain PAUD">
+                        <div class="gallery-overlay">
+                            <span class="gallery-tag">PAUD</span>
+                            <h3 class="gallery-caption">Keseruan Bermain di Playground</h3>
+                            <button class="zoom-btn"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Item 6 (Kategori: SDIT) -->
+                <div class="gallery-item-wrap" data-category="sdit">
+                    <div class="gallery-item">
+                        <img src="https://picsum.photos/600/600?random=106" alt="Tahfidz SD IT">
+                        <div class="gallery-overlay">
+                            <span class="gallery-tag gold">SD IT</span>
+                            <h3 class="gallery-caption">Ujian Setoran Hafalan Qur'an</h3>
+                            <button class="zoom-btn"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            
+            <!-- Tombol Load More (Untuk CMS) -->
+            <div style="text-align: center; margin-top: 3rem;">
+                <a href="#" class="btn-primary" style="background: var(--text-muted);"><i class="fa-solid fa-spinner"></i> Muat Lebih Banyak</a>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- LIGHTBOX MODAL (Untuk Fitur Pop-Up Gambar) -->
+    <div class="lightbox-modal" id="lightbox">
+        <span class="lightbox-close">&times;</span>
+        <div class="lightbox-content">
+            <img src="" alt="Zoom Image" id="lightbox-img">
+            <h3 id="lightbox-caption">Caption Disini</h3>
+        </div>
+    </div>
+
+    <!-- Footer Placeholder -->
+    <div id="footer-placeholder"></div>
+
+    <script src="/js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // ==========================================
+            // 1. LOGIKA FILTER GALERI
+            // ==========================================
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            const galleryItems = document.querySelectorAll('.gallery-item-wrap');
+
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Hapus class active dari semua tombol, lalu tambahkan ke yang diklik
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+
+                    const filterValue = this.getAttribute('data-filter');
+
+                    galleryItems.forEach(item => {
+                        // Animasi sembunyi/tampil
+                        item.style.transform = "scale(0.8)";
+                        item.style.opacity = "0";
+                        
+                        setTimeout(() => {
+                            if (filterValue === 'all' || item.getAttribute('data-category') === filterValue) {
+                                item.style.display = "block";
+                                setTimeout(() => {
+                                    item.style.transform = "scale(1)";
+                                    item.style.opacity = "1";
+                                }, 50);
+                            } else {
+                                item.style.display = "none";
+                            }
+                        }, 300); // Waktu yang sama dengan CSS transition
+                    });
+                });
+            });
+
+            // ==========================================
+            // 2. LOGIKA LIGHTBOX (POP-UP FOTO)
+            // ==========================================
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            const lightboxCaption = document.getElementById('lightbox-caption');
+            const closeBtn = document.querySelector('.lightbox-close');
+            const zoomBtns = document.querySelectorAll('.gallery-item');
+
+            // Buka Lightbox saat foto diklik
+            zoomBtns.forEach(item => {
+                item.addEventListener('click', function() {
+                    const imgUrl = this.querySelector('img').src;
+                    const caption = this.querySelector('.gallery-caption').textContent;
+                    
+                    lightboxImg.src = imgUrl;
+                    lightboxCaption.textContent = caption;
+                    lightbox.classList.add('active');
+                    document.body.style.overflow = "hidden"; // Kunci scroll halaman belakang
+                });
+            });
+
+            // Tutup Lightbox saat tombol (X) diklik
+            closeBtn.addEventListener('click', closeLightbox);
+            
+            // Tutup Lightbox saat area luar foto diklik
+            lightbox.addEventListener('click', function(e) {
+                if (e.target === lightbox) {
+                    closeLightbox();
+                }
+            });
+
+            function closeLightbox() {
+                lightbox.classList.remove('active');
+                document.body.style.overflow = "auto"; // Buka kembali scroll halaman belakang
+            }
+        });
+    </script>
+</body>
+</html>

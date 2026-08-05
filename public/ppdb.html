@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPDB - Yayasan Al-Hidayah Amansari</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-light">
+
+    <!-- Header Placeholder -->
+    <div id="header-placeholder"></div>
+
+    <main>
+        <!-- HEADER HALAMAN PPDB -->
+        <section class="page-header ppdb-header">
+            <div class="header-content">
+                <span class="badge gold">Tahun Ajaran 2026/2027</span>
+                <h1>Penerimaan Peserta Didik Baru</h1>
+                <p>Mari bergabung bersama Yayasan Al-Hidayah Amansari. Daftarkan putra-putri Anda untuk menjadi generasi cerdas dan berakhlak mulia.</p>
+            </div>
+        </section>
+
+        <section class="section-container">
+            <div class="ppdb-layout">
+                
+                <!-- KOLOM KIRI: ALUR & INFORMASI -->
+                <div class="ppdb-info">
+                    <h2 class="section-title" style="text-align: left; margin-bottom: 2rem;">Informasi Pendaftaran</h2>
+                    
+                    <div class="info-card">
+                        <h3><i class="fa-solid fa-calendar-check"></i> Gelombang Pendaftaran</h3>
+                        <ul class="timeline-list">
+                            <li>
+                                <strong>Gelombang 1 (Promo Khusus)</strong>
+                                <span>1 Januari - 31 Maret 2026</span>
+                            </li>
+                            <li>
+                                <strong>Gelombang 2</strong>
+                                <span>1 April - 30 Juni 2026</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="info-card mt-2">
+                        <h3><i class="fa-solid fa-list-check"></i> Syarat Pendaftaran</h3>
+                        <ul class="styled-list">
+                            <li><span>✅</span> Mengisi Formulir Pendaftaran (Online/Offline).</li>
+                            <li><span>✅</span> Fotocopy Akta Kelahiran (2 Lembar).</li>
+                            <li><span>✅</span> Fotocopy Kartu Keluarga (2 Lembar).</li>
+                            <li><span>✅</span> Fotocopy KTP Orang Tua (Ayah & Ibu).</li>
+                            <li><span>✅</span> Pas Foto 3x4 (4 Lembar).</li>
+                        </ul>
+                    </div>
+
+                    <div class="contact-admin-box mt-2">
+                        <p>Ada kendala saat mendaftar? Hubungi panitia kami:</p>
+                        <a href="https://wa.me/6281234567890" class="btn-cta-whatsapp" style="display: inline-block; padding: 0.8rem 1.5rem;"><i class="fa-brands fa-whatsapp"></i> Chat Admin PPDB</a>
+                    </div>
+                </div>
+
+                <!-- KOLOM KANAN: FORMULIR ONLINE -->
+                <div class="ppdb-form-container">
+                    <div class="form-header">
+                        <h3>Formulir Pendaftaran Online</h3>
+                        <p>Isi data dengan lengkap dan benar.</p>
+                    </div>
+                    
+                    <!-- Form ini siap ditembak ke Backend Node.js Anda nanti -->
+                    <form action="/api/submit-ppdb" method="POST" class="ppdb-form">
+                        
+                        <div class="form-group">
+                            <label for="unit">Pilih Unit Pendidikan <span class="required">*</span></label>
+                            <div class="custom-select">
+                                <select id="unit" name="unit" required>
+                                    <option value="" disabled selected>-- Pilih Unit --</option>
+                                    <option value="paud">PAUD / Kelompok Bermain</option>
+                                    <option value="sdit">SD IT (Sekolah Dasar Islam Terpadu)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <h4 class="form-section-title">Data Calon Siswa</h4>
+                        
+                        <div class="form-group">
+                            <label for="nama_siswa">Nama Lengkap Siswa <span class="required">*</span></label>
+                            <input type="text" id="nama_siswa" name="nama_siswa" placeholder="Masukkan nama lengkap sesuai Akta" required>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group half">
+                                <label for="nik_siswa">NIK Siswa <span class="required">*</span></label>
+                                <input type="number" id="nik_siswa" name="nik_siswa" placeholder="16 Digit NIK" required>
+                            </div>
+                            <div class="form-group half">
+                                <label for="jenis_kelamin">Jenis Kelamin <span class="required">*</span></label>
+                                <select id="jenis_kelamin" name="jenis_kelamin" required>
+                                    <option value="" disabled selected>-- Pilih --</option>
+                                    <option value="L">Laki-laki</option>
+                                    <option value="P">Perempuan</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tempat_lahir">Tempat & Tanggal Lahir <span class="required">*</span></label>
+                            <div class="form-row">
+                                <input type="text" name="tempat_lahir" placeholder="Tempat Lahir" class="half" required>
+                                <input type="date" name="tanggal_lahir" class="half" required>
+                            </div>
+                        </div>
+
+                        <h4 class="form-section-title">Data Orang Tua / Wali</h4>
+
+                        <div class="form-group">
+                            <label for="nama_ortu">Nama Ayah / Wali <span class="required">*</span></label>
+                            <input type="text" id="nama_ortu" name="nama_ortu" placeholder="Nama lengkap orang tua/wali" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="no_wa">No. WhatsApp Aktif <span class="required">*</span></label>
+                            <input type="tel" id="no_wa" name="no_wa" placeholder="Contoh: 081234567890" required>
+                            <small class="form-hint">Nomor ini akan digunakan admin untuk menghubungi Anda.</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="alamat">Alamat Lengkap <span class="required">*</span></label>
+                            <textarea id="alamat" name="alamat" rows="3" placeholder="Alamat domisili saat ini..." required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-submit-form"><i class="fa-solid fa-paper-plane"></i> Kirim Formulir Pendaftaran</button>
+                    </form>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer Placeholder -->
+    <div id="footer-placeholder"></div>
+
+    <script src="/js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,40 @@
+<header class="main-header">
+    <div class="logo-container">
+        <!-- Nanti bisa diganti dengan tag <img> untuk logo asli Yayasan -->
+        <h2 style="color: var(--primary-dark); font-weight: 800;">AL-HIDAYAH</h2>
+    </div>
+    
+    <!-- Tombol Hamburger untuk Mobile -->
+    <button class="menu-toggle" id="mobile-menu-btn" aria-label="Buka Menu">
+        <span></span>
+        <span></span>
+        <span></span>
+    </button>
+
+    <!-- Navigasi Utama -->
+    <nav class="nav-menu" id="nav-menu">
+        <ul class="nav-list">
+            <!-- Beri class="active" pada halaman yang sedang dibuka -->
+            <li><a href="/index.html" class="active">Beranda</a></li>
+            <li><a href="/profil.html">Profil</a></li>
+            
+            <!-- Menu Dropdown Unit Pendidikan -->
+            <li class="dropdown">
+                <a href="javascript:void(0)" class="dropbtn">Unit Pendidikan <span style="font-size: 0.8em;">&#9662;</span></a>
+                <div class="dropdown-content">
+                    <a href="/paud.html">PAUD / TK IT</a>
+                    <a href="/sdit.html">SDIT</a>
+                </div>
+            </li>
+
+            <!-- Menu yang disingkat agar header terlihat lebih profesional & lega -->
+            <li><a href="/informasi.html">Informasi</a></li>
+            <li><a href="/galeri.html">Galeri</a></li>
+            
+            <!-- Tombol Aksi -->
+            <li><a href="/ppdb.html" class="nav-btn-outline">PPDB</a></li>
+            <li><a href="/login.html" class="nav-btn-solid">Login Portal</a></li>
+        </ul>
+    </nav>
+</header>
+
