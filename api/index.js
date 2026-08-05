@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // --- Setup Frontend (Vanilla HTML/CSS/JS) ---
-// Mengarahkan Express untuk melayani file statis dari folder 'public'
+// Mengarahkan Express untuk melayani file statis dari folder 'public' (Bekerja saat di Termux)
 app.use(express.static(path.join(__dirname, '../public')));
 
 // --- Endpoint API (Health Check) ---
@@ -32,10 +32,16 @@ app.use((req, res) => {
     res.sendFile(path.join(__dirname, '../public/index.html'));
 });
 
+// --- JALANKAN SERVER (MODIFIKASI UNTUK VERCEL & TERMUX) ---
+// Vercel secara otomatis mengatur NODE_ENV menjadi 'production' atau environment lain.
+// Kondisi ini memastikan app.listen HANYA berjalan saat Anda jalankan manual di Termux.
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`🚀 Server berjalan lokal di http://localhost:${PORT}`);
+        // Panggil config database agar langsung melakukan pengecekan koneksi
+        require('./config/db'); 
+    });
+}
 
-// --- Jalankan Server ---
-app.listen(PORT, () => {
-    console.log(`🚀 Server berjalan lokal di http://localhost:${PORT}`);
-    // Panggil config database agar langsung melakukan pengecekan koneksi
-    require('./config/db'); 
-});
+// WAJIB DITAMBAHKAN: Export app agar Vercel bisa menjalankan Express.js ini sebagai Serverless Function
+module.exports = app;
