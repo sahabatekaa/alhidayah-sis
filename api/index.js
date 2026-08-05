@@ -26,6 +26,45 @@ app.get('/api/status', (req, res) => {
     });
 });
 
+// Panggil koneksi database
+const supabase = require('./config/db');
+
+// --- Endpoint API (Cek Koneksi Supabase) ---
+app.get('/api/cek-db', async (req, res) => {
+    try {
+        // Kita mencoba memanggil tabel bernama 'cek_jaringan' (meskipun tabel ini belum Anda buat)
+        const { data, error } = await supabase.from('cek_jaringan').select('*').limit(1);
+
+        if (error) {
+            // Error dengan kode '42P01' (relation does not exist) dari PostgreSQL 
+            // justru menandakan KONEKSI SUKSES, karena server Supabase berhasil merespons 
+            // bahwa tabel tersebut belum ada.
+            if (error.code === '42P01') {
+                return res.json({ 
+                    koneksi: "Sukses", 
+                    pesan: "Berhasil terhubung ke database Supabase! (Namun tabel belum dibuat di Dashboard)" 
+                });
+            }
+            
+            // Jika error lain (misal: API key salah / URL salah)
+            return res.status(400).json({ 
+                koneksi: "Gagal", 
+                pesan: error.message 
+            });
+        }
+
+        res.json({ 
+            koneksi: "Sukses", 
+            pesan: "Berhasil terhubung ke Supabase dan data ditemukan!", 
+            data 
+        });
+
+    } catch (err) {
+        res.status(500).json({ koneksi: "Error Sistem", pesan: err.message });
+    }
+});
+
+
 // --- Fallback Route / 404 Handler ---
 // Menggunakan app.use() agar kompatibel dengan standar Express v5
 app.use((req, res) => {
