@@ -317,7 +317,9 @@
                     </thead>
                     <tbody id="ppdbTableBody">
                         <tr>
-                            <td colspan="7" style="text-align: center; color: #64748b; padding: 30px;">Memuat data...</td>
+                            <td colspan="7" style="text-align: center; color: #64748b; padding: 30px;">
+                                <i class="ph ph-spinner ph-spin" style="font-size: 1.5rem;"></i><br>Memuat data...
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -393,30 +395,41 @@
             icon.className = sidebarContainer.classList.contains('show-sidebar') ? 'ph ph-x' : 'ph ph-list';
         });
 
-        // --- 4. DATA & LOGIKA PPDB (Simulasi Tabel & Modal) ---
-        let currentDataPPDB = [
-            { 
-                id: 1, nama: 'Ahmad Fauzan', jenjang: 'SDIT', ortu: 'Budi Santoso', wa: '081234567890', 
-                alamat: 'Jl. Merdeka No. 45, Kecamatan Amansari', status: 'Pending',
-                berkas_kk: 'https://link-file-kk.pdf', berkas_akta: 'https://link-file-akta.pdf'
-            },
-            { 
-                id: 2, nama: 'Fatimah Azzahra', jenjang: 'PAUD/TK IT', ortu: 'Ridwan Kamil', wa: '089876543210', 
-                alamat: 'Perumahan Griya Asri Blok C2', status: 'Diterima',
-                berkas_kk: 'https://link-file-kk.pdf', berkas_akta: 'https://link-file-akta.pdf'
-            }
-        ];
-
+        // --- 4. DATA & LOGIKA PPDB (Menarik Data Asli dari Backend) ---
+        let currentDataPPDB = []; // Data dikosongkan agar diisi oleh database
         let selectedStudentId = null;
 
-        // Fungsi Memuat Tabel
+        // Fungsi Menarik Data dari API
+        async function loadPPDBData() {
+            try {
+                const tbody = document.getElementById('ppdbTableBody');
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #64748b; padding: 30px;"><i class="ph ph-spinner ph-spin" style="font-size: 1.5rem;"></i><br>Menarik data pendaftar...</td></tr>`;
+
+                const res = await fetch('/api/admin/ppdb', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await res.json();
+                
+                if (result.success) {
+                    currentDataPPDB = result.data; 
+                    renderTable();
+                } else {
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #ef4444; padding: 30px;">Gagal memuat data: ${result.pesan}</td></tr>`;
+                }
+            } catch (err) {
+                console.error('Koneksi terputus:', err);
+                document.getElementById('ppdbTableBody').innerHTML = `<tr><td colspan="7" style="text-align: center; color: #ef4444; padding: 30px;">Gagal terhubung ke server backend.</td></tr>`;
+            }
+        }
+
+        // Fungsi Memuat Tabel ke Layar
         function renderTable() {
             const tbody = document.getElementById('ppdbTableBody');
             document.getElementById('total-pendaftar').innerText = currentDataPPDB.length;
             document.getElementById('total-pending').innerText = currentDataPPDB.filter(i => i.status === 'Pending').length;
 
             if(currentDataPPDB.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #64748b; padding: 30px;">Belum ada data pendaftar.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #64748b; padding: 30px;">Belum ada data pendaftar masuk.</td></tr>`;
                 return;
             }
 
@@ -434,8 +447,6 @@
                 </tr>
             `).join('');
         }
-
-        renderTable();
 
         // --- 5. FUNGSI JENDELA POP-UP (MODAL) ---
         const modal = document.getElementById('detailModal');
@@ -476,17 +487,20 @@
             
             if(confirm(`Apakah Anda yakin ingin menandai siswa ini sebagai: ${statusBaru}?`)) {
                 
-                // Nanti logika fetch() untuk API Supabase ditulis di sini.
-                
-                // (Simulasi sementara untuk tampilan di layar)
+                // (Saat ini masih berupa simulasi UI. Jika Anda ingin ini tersimpan ke database,
+                // kita bisa menambahkan endpoint PUT/PATCH di Node.js nanti).
                 const studentIndex = currentDataPPDB.findIndex(s => s.id === selectedStudentId);
                 currentDataPPDB[studentIndex].status = statusBaru;
                 
                 renderTable(); 
                 closeModal();  
-                alert(`Sukses! Data siswa telah diubah menjadi ${statusBaru}.`);
+                alert(`Sukses! Data siswa telah diubah menjadi ${statusBaru} (Mode Simulasi UI).`);
             }
         }
+
+        // --- 7. EKSEKUSI AWAL ---
+        // Segera eksekusi penarikan data saat halaman dibuka
+        loadPPDBData();
     </script>
 </body>
 </html>
