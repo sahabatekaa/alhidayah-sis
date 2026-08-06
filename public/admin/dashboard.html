@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - CMS Yayasan Al-Hidayah</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Pustaka Ikon Premium (Phosphor Icons) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        body { 
+            margin: 0; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #f1f5f9; 
+            display: flex; 
+            overflow-x: hidden;
+        }
+        
+        /* Area Kontainer Sidebar */
+        #sidebar-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 40;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Area Konten Utama */
+        #main-content {
+            margin-left: 260px; /* Lebar sidebar */
+            padding: 40px;
+            width: calc(100% - 260px);
+            box-sizing: border-box;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+        
+        /* Header Dashboard */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .header h1 { margin: 0; font-size: 1.8rem; color: #0f172a; }
+        
+        /* Grid Kartu */
+        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+        .card { 
+            background: white; 
+            padding: 24px; 
+            border-radius: 16px; 
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.02); 
+            border: 1px solid #e2e8f0;
+            transition: transform 0.3s;
+        }
+        .card:hover { transform: translateY(-5px); }
+
+        /* =========================================
+           TOMBOL MELAYANG (FLOATING ACTIONS)
+           ========================================= */
+        /* Tombol Hamburger Kiri Bawah (Tersembunyi di Desktop) */
+        .fab-menu {
+            display: none;
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            width: 56px;
+            height: 56px;
+            background: #0f172a;
+            color: white;
+            border-radius: 50%;
+            border: none;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.4);
+            z-index: 50;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: transform 0.2s;
+        }
+        .fab-menu:active { transform: scale(0.9); }
+
+        /* Tombol Live Chat Kanan Bawah (Muncul di semua ukuran) */
+        .fab-chat {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border-radius: 50%;
+            border: none;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+            z-index: 50;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            transition: all 0.3s;
+        }
+        .fab-chat:hover { transform: scale(1.1); }
+
+        /* =========================================
+           RESPONSIVE MOBILE (< 768px)
+           ========================================= */
+        @media (max-width: 768px) {
+            #main-content { margin-left: 0; width: 100%; padding: 20px; padding-bottom: 100px; }
+            .header { flex-direction: column; align-items: flex-start; gap: 10px; }
+            
+            /* Sidebar disembunyikan di luar layar sebelah kiri */
+            #sidebar-container { transform: translateX(-100%); }
+            
+            /* Class ini akan ditambahkan via JS saat tombol menu diklik */
+            #sidebar-container.show-sidebar { transform: translateX(0); box-shadow: 10px 0 25px rgba(0,0,0,0.5); }
+            
+            /* Tampilkan Hamburger Menu */
+            .fab-menu { display: flex; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Wadah Sidebar -->
+    <div id="sidebar-container"></div>
+
+    <!-- Tombol Melayang Mobile Menu (Kiri Bawah) -->
+    <button class="fab-menu" id="btnToggleMenu">
+        <i class="ph ph-list"></i>
+    </button>
+
+    <!-- Tombol Melayang Live Chat (Kanan Bawah) -->
+    <button class="fab-chat" title="Bantuan Live Chat">
+        <i class="ph-fill ph-chat-circle-dots"></i>
+    </button>
+
+    <!-- Konten Utama -->
+    <main id="main-content">
+        <div class="header">
+            <div>
+                <h1>Selamat Datang 👋</h1>
+                <p style="color: #64748b; margin-top: 5px; font-size: 0.95rem;">Pantau dan kelola data yayasan hari ini.</p>
+            </div>
+            <span id="user-display" style="padding: 8px 16px; background: #d1fae5; color: #047857; border-radius: 20px; font-weight: 600; font-size: 0.9rem;">
+                Superadmin
+            </span>
+        </div>
+
+        <div class="card-grid">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 style="margin:0; font-size:1.1rem;">Pendaftar PPDB</h3>
+                    <i class="ph-fill ph-users-three" style="font-size: 2rem; color: #10b981;"></i>
+                </div>
+                <p style="color: #64748b; font-size: 0.9rem; line-height: 1.6;">Kelola data calon siswa PAUD/TK IT & SDIT yang baru mendaftar hari ini.</p>
+            </div>
+            
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                    <h3 style="margin:0; font-size:1.1rem;">Artikel & Berita</h3>
+                    <i class="ph-fill ph-newspaper" style="font-size: 2rem; color: #f59e0b;"></i>
+                </div>
+                <p style="color: #64748b; font-size: 0.9rem; line-height: 1.6;">Publikasikan pengumuman atau kegiatan terbaru untuk wali murid.</p>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- 1. PROTEKSI HALAMAN (CEK TOKEN) ---
+        const token = localStorage.getItem('cms_token');
+        if (!token) {
+            window.location.href = '/admin/login.html';
+        }
+
+        const user = JSON.parse(localStorage.getItem('cms_user'));
+        if(user) document.getElementById('user-display').innerText = user.full_name;
+
+        // --- 2. LOAD SIDEBAR SECARA DINAMIS ---
+        fetch('/admin/components/sidebar.html')
+            .then(response => response.text())
+            .then(data => {
+                if (data.includes('<html') || data.includes('Membangun Generasi Rabbani')) {
+                    console.error('File sidebar tidak ditemukan.');
+                } else {
+                    document.getElementById('sidebar-container').innerHTML = data;
+                }
+            })
+            .catch(err => console.error("Gagal memuat sidebar:", err));
+
+        // --- 3. LOGIKA TOGGLE MENU MOBILE (HAMBURGER KIRI BAWAH) ---
+        const btnToggleMenu = document.getElementById('btnToggleMenu');
+        const sidebarContainer = document.getElementById('sidebar-container');
+        
+        btnToggleMenu.addEventListener('click', () => {
+            sidebarContainer.classList.toggle('show-sidebar');
+            
+            // Ubah ikon dari List (garis tiga) menjadi X
+            const icon = btnToggleMenu.querySelector('i');
+            if (sidebarContainer.classList.contains('show-sidebar')) {
+                icon.className = 'ph ph-x';
+            } else {
+                icon.className = 'ph ph-list';
+            }
+        });
+
+        // Tutup sidebar jika user men-klik area konten utama (di HP)
+        document.getElementById('main-content').addEventListener('click', () => {
+            if (window.innerWidth <= 768 && sidebarContainer.classList.contains('show-sidebar')) {
+                sidebarContainer.classList.remove('show-sidebar');
+                btnToggleMenu.querySelector('i').className = 'ph ph-list';
+            }
+        });
+
+        // --- 4. FUNGSI LOGOUT ---
+        function logoutCMS() {
+            localStorage.removeItem('cms_token');
+            localStorage.removeItem('cms_user');
+            window.location.href = '/admin/login.html';
+        }
+    </script>
+</body>
+</html>

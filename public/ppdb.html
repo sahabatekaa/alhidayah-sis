@@ -9,11 +9,9 @@
 </head>
 <body class="bg-light">
 
-    <!-- Header Placeholder -->
     <div id="header-placeholder"></div>
 
     <main>
-        <!-- HEADER HALAMAN PPDB -->
         <section class="page-header ppdb-header">
             <div class="header-content">
                 <span class="badge gold">Tahun Ajaran 2026/2027</span>
@@ -25,7 +23,6 @@
         <section class="section-container">
             <div class="ppdb-layout">
                 
-                <!-- KOLOM KIRI: ALUR & INFORMASI -->
                 <div class="ppdb-info">
                     <h2 class="section-title" style="text-align: left; margin-bottom: 2rem;">Informasi Pendaftaran</h2>
                     
@@ -60,23 +57,22 @@
                     </div>
                 </div>
 
-                <!-- KOLOM KANAN: FORMULIR ONLINE -->
                 <div class="ppdb-form-container">
                     <div class="form-header">
                         <h3>Formulir Pendaftaran Online</h3>
                         <p>Isi data dengan lengkap dan benar.</p>
                     </div>
                     
-                    <!-- Form ini siap ditembak ke Backend Node.js Anda nanti -->
-                    <form action="/api/submit-ppdb" method="POST" class="ppdb-form">
+                    <!-- Form telah disesuaikan dengan koneksi ke api.js -->
+                    <form id="form-ppdb" class="ppdb-form">
                         
                         <div class="form-group">
                             <label for="unit">Pilih Unit Pendidikan <span class="required">*</span></label>
                             <div class="custom-select">
-                                <select id="unit" name="unit" required>
+                                <select id="unit" name="unit_id" required>
                                     <option value="" disabled selected>-- Pilih Unit --</option>
-                                    <option value="paud">PAUD / Kelompok Bermain</option>
-                                    <option value="sdit">SD IT (Sekolah Dasar Islam Terpadu)</option>
+                                    <option value="1">PAUD / Kelompok Bermain</option>
+                                    <option value="2">SD IT (Sekolah Dasar Islam Terpadu)</option>
                                 </select>
                             </div>
                         </div>
@@ -138,9 +134,9 @@
 
     </main>
 
-    <!-- Footer Placeholder -->
     <div id="footer-placeholder"></div>
 
+    <script src="/js/api.js"></script>
     <script src="/js/main.js"></script>
 </body>
 </html>

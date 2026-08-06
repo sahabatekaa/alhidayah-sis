@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Portal - Yayasan Al-Hidayah Amansari</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --paud-emerald: #10b981;
+            --sdit-amber: #f59e0b;
+            --dark-bg: #0f172a;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Reset total agar tidak ada ruang sisa */
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: var(--dark-bg);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: white;
+        }
+
+        /* Kontraktor Utama yang mengunci posisi persis di tengah */
+        .page-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at top left, var(--dark-bg), #020617);
+            overflow: hidden;
+        }
+
+        /* Ornamen Latar Belakang yang aman */
+        .blob {
+            position: absolute;
+            filter: blur(80px);
+            z-index: 1;
+            opacity: 0.4;
+            pointer-events: none;
+        }
+        .blob-1 { top: -10%; left: -10%; width: 300px; height: 300px; background: var(--paud-emerald); border-radius: 50%; }
+        .blob-2 { bottom: -10%; right: -10%; width: 350px; height: 350px; background: var(--sdit-amber); border-radius: 50%; }
+
+        /* Kartu Login dijamin sentris */
+        .login-card {
+            position: relative;
+            z-index: 2;
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            padding: 2.5rem 2rem;
+            border-radius: 24px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+            text-align: center;
+        }
+
+        /* Area Logo Yayasan */
+        .logo-container {
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: center;
+        }
+        .logo-img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            background-color: rgba(255, 255, 255, 0.08);
+            border-radius: 50%;
+            padding: 8px;
+            border: 1px dashed var(--paud-emerald);
+        }
+        
+        .login-card h2 { margin: 0 0 6px; font-size: 1.4rem; letter-spacing: -0.5px; }
+        .login-card p { color: #94a3b8; font-size: 0.85rem; margin: 0 0 1.75rem; }
+        
+        .input-group { margin-bottom: 1.2rem; text-align: left; }
+        .input-group label { display: block; font-size: 0.8rem; margin-bottom: 6px; color: #cbd5e1; font-weight: 600; }
+        .input-group input {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: white;
+            font-family: inherit;
+            outline: none;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+        .input-group input:focus { border-color: var(--paud-emerald); box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2); }
+        
+        button {
+            width: 100%;
+            padding: 13px;
+            margin-top: 8px;
+            background: linear-gradient(135deg, var(--paud-emerald), #059669);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-family: inherit;
+        }
+        button:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.4); }
+        button:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+        
+        #error-message { color: #f87171; font-size: 0.8rem; margin-top: 1rem; display: none; background: rgba(239, 68, 68, 0.1); padding: 8px; border-radius: 8px; border: 1px solid rgba(239, 68, 68, 0.2); }
+    </style>
+</head>
+<body>
+
+    <div class="page-wrapper">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+
+        <div class="login-card">
+            <div class="logo-container">
+                <img src="/assets/logo.png" alt="Logo Yayasan" class="logo-img" id="web-logo" onerror="this.onerror=null; this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'%2310b981\'><path d=\'M12 3L1 9l4 2.18v6L12 21l7-3.82v-6l2-1.09V17h2V9L12 3zm6.82 6L12 12.72 5.18 9 12 5.28 18.82 9zM17 15.99l-5 2.73-5-2.73v-3.72L12 15l5-2.73v3.72z\'/></svg>'">
+            </div>
+
+            <h2>Superadmin CMS</h2>
+            <p>Yayasan Al-Hidayah Amansari</p>
+            
+            <form id="loginForm">
+                <div class="input-group">
+                    <label for="email">Alamat Email</label>
+                    <input type="email" id="email" required placeholder="admin@alhidayahamansari.sch.id">
+                </div>
+                <div class="input-group">
+                    <label for="password">Kata Sandi</label>
+                    <input type="password" id="password" required placeholder="••••••••">
+                </div>
+                <button type="submit" id="loginBtn">Masuk ke Portal</button>
+                <div id="error-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('loginBtn');
+            const errorDiv = document.getElementById('error-message');
+
+            btn.innerText = 'Memverifikasi...';
+            btn.disabled = true;
+            errorDiv.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    localStorage.setItem('cms_token', result.token);
+                    localStorage.setItem('cms_user', JSON.stringify(result.user));
+                    window.location.href = '/admin/dashboard.html';
+                } else {
+                    errorDiv.innerText = result.pesan || 'Login gagal.';
+                    errorDiv.style.display = 'block';
+                }
+            } catch (err) {
+                errorDiv.innerText = 'Tidak dapat terhubung ke server.';
+                errorDiv.style.display = 'block';
+            } finally {
+                btn.innerText = 'Masuk ke Portal';
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>

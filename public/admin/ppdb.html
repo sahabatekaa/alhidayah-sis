@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Data PPDB - CMS Yayasan Al-Hidayah</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Pustaka Ikon Premium (Phosphor Icons) -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        body { 
+            margin: 0; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background-color: #f1f5f9; 
+            display: flex; 
+            overflow-x: hidden;
+        }
+        
+        /* Wadah Sidebar */
+        #sidebar-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 40;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Area Konten Utama */
+        #main-content {
+            margin-left: 260px;
+            padding: 40px;
+            width: calc(100% - 260px);
+            box-sizing: border-box;
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+        
+        /* Header Halaman */
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .header h1 { margin: 0; font-size: 1.8rem; color: #0f172a; }
+        
+        /* Statistik Singkat */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        /* Kontainer Tabel Utama */
+        .table-card {
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.02);
+            overflow: hidden;
+        }
+        .table-header-action {
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            padding: 8px 14px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 300px;
+            box-sizing: border-box;
+        }
+        .search-box input {
+            border: none;
+            background: transparent;
+            outline: none;
+            font-family: inherit;
+            width: 100%;
+            font-size: 0.9rem;
+            color: #0f172a;
+        }
+
+        /* Tabel Responsif */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+        th, td {
+            padding: 16px 24px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+            white-space: nowrap;
+        }
+        th {
+            background: #f8fafc;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+        tr:hover td { background: #f8fafc; }
+
+        /* Badge Status */
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge-pending { background: #fef3c7; color: #d97706; }
+        .badge-success { background: #d1fae5; color: #059669; }
+
+        /* Tombol Aksi Tabel */
+        .btn-action {
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            background: white;
+            color: #0f172a;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+        .btn-action:hover { background: #0f172a; color: white; border-color: #0f172a; }
+
+        /* Tombol Melayang Mobile */
+        .fab-menu {
+            display: none;
+            position: fixed;
+            bottom: 24px;
+            left: 24px;
+            width: 56px;
+            height: 56px;
+            background: #0f172a;
+            color: white;
+            border-radius: 50%;
+            border: none;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.4);
+            z-index: 50;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        .fab-chat {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border-radius: 50%;
+            border: none;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+            z-index: 50;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        /* =========================================
+           MODAL (JENDELA DETAIL & EKSEKUSI)
+           ========================================= */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);
+            z-index: 100; display: none; justify-content: center; align-items: center;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .modal-overlay.show { display: flex; opacity: 1; }
+        
+        .modal-card {
+            background: white; border-radius: 20px; width: 90%; max-width: 600px;
+            max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+            transform: translateY(20px); transition: transform 0.3s;
+        }
+        .modal-overlay.show .modal-card { transform: translateY(0); }
+
+        .modal-header {
+            padding: 20px 24px; border-bottom: 1px solid #e2e8f0;
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; background: white; z-index: 10;
+        }
+        .modal-header h2 { margin: 0; font-size: 1.25rem; color: #0f172a; }
+        .btn-close { background: #f1f5f9; border: none; width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: #64748b; transition: 0.2s; }
+        .btn-close:hover { background: #e2e8f0; color: #ef4444; }
+
+        .modal-body { padding: 24px; }
+        .detail-group { margin-bottom: 20px; }
+        .detail-group label { display: block; font-size: 0.8rem; color: #64748b; margin-bottom: 5px; font-weight: 600; text-transform: uppercase; }
+        .detail-group p { margin: 0; font-size: 1rem; color: #0f172a; font-weight: 500; }
+
+        /* Tombol Dokumen */
+        .doc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; }
+        .btn-doc { display: flex; align-items: center; gap: 8px; padding: 12px; border-radius: 10px; background: #f8fafc; border: 1px solid #cbd5e1; color: #334155; text-decoration: none; font-size: 0.9rem; font-weight: 600; transition: 0.2s; }
+        .btn-doc:hover { border-color: #3b82f6; color: #3b82f6; background: #eff6ff; }
+
+        .modal-footer {
+            padding: 20px 24px; border-top: 1px solid #e2e8f0; background: #f8fafc;
+            display: flex; gap: 12px; justify-content: flex-end; flex-wrap: wrap;
+        }
+        
+        /* Tombol Aksi */
+        .btn { padding: 10px 18px; border-radius: 10px; font-weight: 600; border: none; cursor: pointer; display: flex; align-items: center; gap: 8px; font-family: inherit; font-size: 0.9rem; transition: 0.2s; }
+        .btn-wa { background: #25D366; color: white; margin-right: auto; }
+        .btn-wa:hover { background: #128C7E; transform: translateY(-2px); }
+        .btn-reject { background: #fee2e2; color: #dc2626; }
+        .btn-reject:hover { background: #fca5a5; }
+        .btn-accept { background: #10b981; color: white; }
+        .btn-accept:hover { background: #059669; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); }
+
+        /* Responsif Layar Kecil */
+        @media (max-width: 768px) {
+            #main-content { margin-left: 0; width: 100%; padding: 20px; padding-bottom: 100px; }
+            .header { flex-direction: column; align-items: flex-start; gap: 10px; }
+            #sidebar-container { transform: translateX(-100%); }
+            #sidebar-container.show-sidebar { transform: translateX(0); box-shadow: 10px 0 25px rgba(0,0,0,0.5); }
+            .fab-menu { display: flex; }
+            .doc-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Wadah Sidebar -->
+    <div id="sidebar-container"></div>
+
+    <!-- Tombol Navigasi HP -->
+    <button class="fab-menu" id="btnToggleMenu"><i class="ph ph-list"></i></button>
+    <button class="fab-chat" title="Bantuan"><i class="ph-fill ph-chat-circle-dots"></i></button>
+
+    <!-- Konten Utama -->
+    <main id="main-content">
+        <div class="header">
+            <div>
+                <h1>Data Pendaftar PPDB</h1>
+                <p style="color: #64748b; margin-top: 5px; font-size: 0.95rem;">Kelola calon siswa baru tingkat PAUD/TK IT & SDIT.</p>
+            </div>
+            <span id="user-display" style="padding: 8px 16px; background: #d1fae5; color: #047857; border-radius: 20px; font-weight: 600; font-size: 0.9rem;">
+                Superadmin
+            </span>
+        </div>
+
+        <!-- Statistik Kotak -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #e0f2fe; color: #0284c7;"><i class="ph-fill ph-users"></i></div>
+                <div>
+                    <span style="display: block; color: #64748b; font-size: 0.85rem;">Total Pendaftar</span>
+                    <h3 style="margin: 0; font-size: 1.5rem; color: #0f172a;" id="total-pendaftar">0</h3>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #fef3c7; color: #d97706;"><i class="ph-fill ph-hourglass"></i></div>
+                <div>
+                    <span style="display: block; color: #64748b; font-size: 0.85rem;">Menunggu Verifikasi</span>
+                    <h3 style="margin: 0; font-size: 1.5rem; color: #0f172a;" id="total-pending">0</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabel Data -->
+        <div class="table-card">
+            <div class="table-header-action">
+                <h3 style="margin: 0; font-size: 1.1rem; color: #0f172a;">Daftar Calon Siswa Masuk</h3>
+                <div class="search-box">
+                    <i class="ph ph-magnifying-glass" style="color: #64748b; font-size: 1.1rem;"></i>
+                    <input type="text" id="searchInput" placeholder="Cari nama siswa...">
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>Nama Lengkap</th>
+                            <th>Jenjang Pilihan</th>
+                            <th>Nama Orang Tua</th>
+                            <th>No. WhatsApp</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ppdbTableBody">
+                        <tr>
+                            <td colspan="7" style="text-align: center; color: #64748b; padding: 30px;">Memuat data...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- MODAL DETAIL PPDB -->
+        <div class="modal-overlay" id="detailModal">
+            <div class="modal-card">
+                <div class="modal-header">
+                    <h2>Detail Calon Siswa</h2>
+                    <button class="btn-close" onclick="closeModal()"><i class="ph ph-x"></i></button>
+                </div>
+                <div class="modal-body">
+                    <div class="detail-group">
+                        <label>Nama Lengkap & Jenjang</label>
+                        <p><span id="mdl-nama">-</span> (<span id="mdl-jenjang" style="color: #10b981;">-</span>)</p>
+                    </div>
+                    <div class="detail-group">
+                        <label>Nama Orang Tua / Wali</label>
+                        <p id="mdl-ortu">-</p>
+                    </div>
+                    <div class="detail-group">
+                        <label>Alamat Domisili</label>
+                        <p id="mdl-alamat" style="font-size: 0.9rem; line-height: 1.5;">-</p>
+                    </div>
+                    
+                    <hr style="border: 0; border-top: 1px dashed #cbd5e1; margin: 20px 0;">
+                    
+                    <div class="detail-group">
+                        <label>Berkas Lampiran</label>
+                        <div class="doc-grid">
+                            <a href="#" target="_blank" id="mdl-doc-kk" class="btn-doc"><i class="ph-fill ph-file-text" style="font-size: 1.5rem; color: #f59e0b;"></i> Kartu Keluarga</a>
+                            <a href="#" target="_blank" id="mdl-doc-akta" class="btn-doc"><i class="ph-fill ph-file-pdf" style="font-size: 1.5rem; color: #ef4444;"></i> Akta Kelahiran</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <!-- Tombol WA ke Ortu -->
+                    <a href="#" target="_blank" id="mdl-btn-wa" class="btn btn-wa">
+                        <i class="ph-fill ph-whatsapp-logo" style="font-size: 1.2rem;"></i> Hubungi WA
+                    </a>
+                    
+                    <!-- Tombol Eksekusi -->
+                    <button class="btn btn-reject" onclick="prosesStatus('Ditolak')">Tolak Berkas</button>
+                    <button class="btn btn-accept" onclick="prosesStatus('Diterima')">Terima Siswa</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // --- 1. PROTEKSI HALAMAN ---
+        const token = localStorage.getItem('cms_token');
+        if (!token) window.location.href = '/admin/login.html';
+
+        const user = JSON.parse(localStorage.getItem('cms_user'));
+        if(user) document.getElementById('user-display').innerText = user.full_name;
+
+        // --- 2. LOAD SIDEBAR DINAMIS ---
+        fetch('/admin/components/sidebar.html')
+            .then(res => res.text())
+            .then(data => {
+                if (!data.includes('<html')) document.getElementById('sidebar-container').innerHTML = data;
+            });
+
+        // --- 3. TOGGLE MOBILE MENU ---
+        const btnToggleMenu = document.getElementById('btnToggleMenu');
+        const sidebarContainer = document.getElementById('sidebar-container');
+        btnToggleMenu.addEventListener('click', () => {
+            sidebarContainer.classList.toggle('show-sidebar');
+            const icon = btnToggleMenu.querySelector('i');
+            icon.className = sidebarContainer.classList.contains('show-sidebar') ? 'ph ph-x' : 'ph ph-list';
+        });
+
+        // --- 4. DATA & LOGIKA PPDB (Simulasi Tabel & Modal) ---
+        let currentDataPPDB = [
+            { 
+                id: 1, nama: 'Ahmad Fauzan', jenjang: 'SDIT', ortu: 'Budi Santoso', wa: '081234567890', 
+                alamat: 'Jl. Merdeka No. 45, Kecamatan Amansari', status: 'Pending',
+                berkas_kk: 'https://link-file-kk.pdf', berkas_akta: 'https://link-file-akta.pdf'
+            },
+            { 
+                id: 2, nama: 'Fatimah Azzahra', jenjang: 'PAUD/TK IT', ortu: 'Ridwan Kamil', wa: '089876543210', 
+                alamat: 'Perumahan Griya Asri Blok C2', status: 'Diterima',
+                berkas_kk: 'https://link-file-kk.pdf', berkas_akta: 'https://link-file-akta.pdf'
+            }
+        ];
+
+        let selectedStudentId = null;
+
+        // Fungsi Memuat Tabel
+        function renderTable() {
+            const tbody = document.getElementById('ppdbTableBody');
+            document.getElementById('total-pendaftar').innerText = currentDataPPDB.length;
+            document.getElementById('total-pending').innerText = currentDataPPDB.filter(i => i.status === 'Pending').length;
+
+            if(currentDataPPDB.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #64748b; padding: 30px;">Belum ada data pendaftar.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = currentDataPPDB.map((item, index) => `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td style="font-weight: 600; color: #0f172a;">${item.nama}</td>
+                    <td><span style="padding: 4px 10px; background: #e2e8f0; border-radius: 6px; font-size: 0.8rem; font-weight: 600;">${item.jenjang}</span></td>
+                    <td>${item.ortu}</td>
+                    <td>${item.wa}</td>
+                    <td><span class="badge ${item.status === 'Pending' ? 'badge-pending' : (item.status === 'Diterima' ? 'badge-success' : 'badge-pending')}" style="${item.status === 'Ditolak' ? 'background:#fee2e2; color:#dc2626;' : ''}">${item.status}</span></td>
+                    <td>
+                        <button class="btn-action" onclick="openModal(${item.id})">Detail / Proses</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        renderTable();
+
+        // --- 5. FUNGSI JENDELA POP-UP (MODAL) ---
+        const modal = document.getElementById('detailModal');
+
+        function openModal(id) {
+            const student = currentDataPPDB.find(s => s.id === id);
+            if(!student) return;
+            
+            selectedStudentId = id;
+
+            // Isi teks di dalam modal
+            document.getElementById('mdl-nama').innerText = student.nama;
+            document.getElementById('mdl-jenjang').innerText = student.jenjang;
+            document.getElementById('mdl-ortu').innerText = student.ortu;
+            document.getElementById('mdl-alamat').innerText = student.alamat;
+
+            // Atur Link Dokumen
+            document.getElementById('mdl-doc-kk').href = student.berkas_kk;
+            document.getElementById('mdl-doc-akta').href = student.berkas_akta;
+
+            // Logika Follow-up WA
+            let waNumber = student.wa.startsWith('0') ? '62' + student.wa.substring(1) : student.wa;
+            let waMessage = `Assalamu'alaikum Bapak/Ibu ${student.ortu}. \n\nKami dari Panitia PPDB Yayasan Al-Hidayah Amansari ingin menginformasikan terkait pendaftaran ananda *${student.nama}*...`;
+            document.getElementById('mdl-btn-wa').href = `https://wa.me/${waNumber}?text=${encodeURIComponent(waMessage)}`;
+
+            // Tampilkan Modal
+            modal.classList.add('show');
+        }
+
+        function closeModal() {
+            modal.classList.remove('show');
+            selectedStudentId = null;
+        }
+
+        // --- 6. FUNGSI TERIMA / TOLAK ---
+        function prosesStatus(statusBaru) {
+            if(!selectedStudentId) return;
+            
+            if(confirm(`Apakah Anda yakin ingin menandai siswa ini sebagai: ${statusBaru}?`)) {
+                
+                // Nanti logika fetch() untuk API Supabase ditulis di sini.
+                
+                // (Simulasi sementara untuk tampilan di layar)
+                const studentIndex = currentDataPPDB.findIndex(s => s.id === selectedStudentId);
+                currentDataPPDB[studentIndex].status = statusBaru;
+                
+                renderTable(); 
+                closeModal();  
+                alert(`Sukses! Data siswa telah diubah menjadi ${statusBaru}.`);
+            }
+        }
+    </script>
+</body>
+</html>
