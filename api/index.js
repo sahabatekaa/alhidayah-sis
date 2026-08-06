@@ -314,4 +314,41 @@ if (process.env.NODE_ENV !== 'production') {
     });
 }
 
+// 1. Menghapus satu data PPDB berdasarkan ID
+app.delete('/api/admin/ppdb/:id', verifyToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        const { error } = await supabase
+            .from('ppdb')
+            .delete()
+            .eq('id', id);
+
+        if (error) throw error;
+
+        res.json({ success: true, pesan: 'Data pendaftar berhasil dihapus.' });
+    } catch (err) {
+        console.error("Error Delete PPDB:", err);
+        res.status(500).json({ success: false, pesan: 'Gagal menghapus data dari database.' });
+    }
+});
+
+// 2. Menghapus seluruh data PPDB (Reset untuk Tahun Ajaran Baru)
+app.delete('/api/admin/ppdb-reset', verifyToken, async (req, res) => {
+    try {
+        // Menghapus semua baris di tabel ppdb
+        const { error } = await supabase
+            .from('ppdb')
+            .delete()
+            .neq('id', 0); // Kondisi agar Supabase mengizinkan hapus massal
+
+        if (error) throw error;
+
+        res.json({ success: true, pesan: 'Semua data PPDB berhasil dikosongkan untuk tahun ajaran baru.' });
+    } catch (err) {
+        console.error("Error Reset PPDB:", err);
+        res.status(500).json({ success: false, pesan: 'Gagal mengosongkan data database.' });
+    }
+});
+
 module.exports = app;

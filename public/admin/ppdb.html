@@ -80,6 +80,15 @@
             gap: 15px;
             flex-wrap: wrap;
         }
+        .action-group-right {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            width: 100%;
+            max-width: 500px;
+            justify-content: flex-end;
+        }
         .search-box {
             display: flex;
             align-items: center;
@@ -89,7 +98,7 @@
             padding: 8px 14px;
             border-radius: 10px;
             width: 100%;
-            max-width: 300px;
+            max-width: 260px;
             box-sizing: border-box;
         }
         .search-box input {
@@ -101,6 +110,24 @@
             font-size: 0.9rem;
             color: #0f172a;
         }
+
+        /* Tombol Reset Massal */
+        .btn-reset-all {
+            background: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fca5a5;
+            padding: 9px 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.9rem;
+            font-family: inherit;
+            transition: 0.2s;
+        }
+        .btn-reset-all:hover { background: #fca5a5; color: #b91c1c; }
 
         /* Tabel Responsif */
         .table-responsive {
@@ -230,15 +257,20 @@
 
         .modal-footer {
             padding: 20px 24px; border-top: 1px solid #e2e8f0; background: #f8fafc;
-            display: flex; gap: 12px; justify-content: flex-end; flex-wrap: wrap;
+            display: flex; gap: 10px; justify-content: flex-end; flex-wrap: wrap; align-items: center;
         }
         
         /* Tombol Aksi */
-        .btn { padding: 10px 18px; border-radius: 10px; font-weight: 600; border: none; cursor: pointer; display: flex; align-items: center; gap: 8px; font-family: inherit; font-size: 0.9rem; transition: 0.2s; }
+        .btn { padding: 10px 16px; border-radius: 10px; font-weight: 600; border: none; cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: inherit; font-size: 0.9rem; transition: 0.2s; }
         .btn-wa { background: #25D366; color: white; margin-right: auto; }
         .btn-wa:hover { background: #128C7E; transform: translateY(-2px); }
+        
+        .btn-delete { background: #f1f5f9; color: #ef4444; border: 1px solid #cbd5e1; }
+        .btn-delete:hover { background: #fee2e2; border-color: #fca5a5; }
+
         .btn-reject { background: #fee2e2; color: #dc2626; }
         .btn-reject:hover { background: #fca5a5; }
+        
         .btn-accept { background: #10b981; color: white; }
         .btn-accept:hover { background: #059669; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); }
 
@@ -250,6 +282,8 @@
             #sidebar-container.show-sidebar { transform: translateX(0); box-shadow: 10px 0 25px rgba(0,0,0,0.5); }
             .fab-menu { display: flex; }
             .doc-grid { grid-template-columns: 1fr; }
+            .action-group-right { max-width: 100%; justify-content: space-between; }
+            .search-box { max-width: 100%; }
         }
     </style>
 </head>
@@ -296,9 +330,16 @@
         <div class="table-card">
             <div class="table-header-action">
                 <h3 style="margin: 0; font-size: 1.1rem; color: #0f172a;">Daftar Calon Siswa Masuk</h3>
-                <div class="search-box">
-                    <i class="ph ph-magnifying-glass" style="color: #64748b; font-size: 1.1rem;"></i>
-                    <input type="text" id="searchInput" placeholder="Cari nama siswa...">
+                <div class="action-group-right">
+                    <!-- Tombol Reset Massal (Tahun Ajaran Baru) -->
+                    <button class="btn-reset-all" onclick="confirmResetPPDB()" title="Kosongkan seluruh data untuk tahun ajaran baru">
+                        <i class="ph ph-trash" style="font-size: 1.1rem;"></i> Reset Tahun Ajaran
+                    </button>
+                    <!-- Kotak Pencarian -->
+                    <div class="search-box">
+                        <i class="ph ph-magnifying-glass" style="color: #64748b; font-size: 1.1rem;"></i>
+                        <input type="text" id="searchInput" placeholder="Cari nama...">
+                    </div>
                 </div>
             </div>
 
@@ -318,7 +359,7 @@
                     <tbody id="ppdbTableBody">
                         <tr>
                             <td colspan="7" style="text-align: center; color: #64748b; padding: 30px;">
-                                <i class="ph ph-spinner ph-spin" style="font-size: 1.5rem;"></i><br>Memuat data...
+                                <i class="ph ph-spinner ph-spin" style="font-size: 1.5rem;"></i><br>Menarik data...
                             </td>
                         </tr>
                     </tbody>
@@ -358,14 +399,17 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <!-- Tombol WA ke Ortu -->
+                    <!-- Tombol WhatsApp -->
                     <a href="#" target="_blank" id="mdl-btn-wa" class="btn btn-wa">
-                        <i class="ph-fill ph-whatsapp-logo" style="font-size: 1.2rem;"></i> Hubungi WA
+                        <i class="ph-fill ph-whatsapp-logo" style="font-size: 1.2rem;"></i> WhatsApp
                     </a>
                     
-                    <!-- Tombol Eksekusi -->
-                    <button class="btn btn-reject" onclick="prosesStatus('Ditolak')">Tolak Berkas</button>
-                    <button class="btn btn-accept" onclick="prosesStatus('Diterima')">Terima Siswa</button>
+                    <!-- Tombol Hapus Satuan -->
+                    <button class="btn btn-delete" onclick="hapusSiswaTerpilih()">Hapus</button>
+
+                    <!-- Tombol Eksekusi Status -->
+                    <button class="btn btn-reject" onclick="prosesStatus('Ditolak')">Tolak</button>
+                    <button class="btn btn-accept" onclick="prosesStatus('Diterima')">Terima</button>
                 </div>
             </div>
         </div>
@@ -395,15 +439,14 @@
             icon.className = sidebarContainer.classList.contains('show-sidebar') ? 'ph ph-x' : 'ph ph-list';
         });
 
-        // --- 4. DATA & LOGIKA PPDB (Menarik Data Asli dari Backend) ---
-        let currentDataPPDB = []; // Data dikosongkan agar diisi oleh database
+        // --- 4. DATA & LOGIKA PPDB ---
+        let currentDataPPDB = [];
         let selectedStudentId = null;
 
-        // Fungsi Menarik Data dari API
         async function loadPPDBData() {
             try {
                 const tbody = document.getElementById('ppdbTableBody');
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #64748b; padding: 30px;"><i class="ph ph-spinner ph-spin" style="font-size: 1.5rem;"></i><br>Menarik data pendaftar...</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: #64748b; padding: 30px;"><i class="ph ph-spinner ph-spin" style="font-size: 1.5rem;"></i><br>Menarik data...</td></tr>`;
 
                 const res = await fetch('/api/admin/ppdb', {
                     headers: { 'Authorization': `Bearer ${token}` }
@@ -422,7 +465,6 @@
             }
         }
 
-        // Fungsi Memuat Tabel ke Layar
         function renderTable() {
             const tbody = document.getElementById('ppdbTableBody');
             document.getElementById('total-pendaftar').innerText = currentDataPPDB.length;
@@ -457,22 +499,18 @@
             
             selectedStudentId = id;
 
-            // Isi teks di dalam modal
             document.getElementById('mdl-nama').innerText = student.nama;
             document.getElementById('mdl-jenjang').innerText = student.jenjang;
             document.getElementById('mdl-ortu').innerText = student.ortu;
             document.getElementById('mdl-alamat').innerText = student.alamat;
 
-            // Atur Link Dokumen
             document.getElementById('mdl-doc-kk').href = student.berkas_kk;
             document.getElementById('mdl-doc-akta').href = student.berkas_akta;
 
-            // Logika Follow-up WA
             let waNumber = student.wa.startsWith('0') ? '62' + student.wa.substring(1) : student.wa;
             let waMessage = `Assalamu'alaikum Bapak/Ibu ${student.ortu}. \n\nKami dari Panitia PPDB Yayasan Al-Hidayah Amansari ingin menginformasikan terkait pendaftaran ananda *${student.nama}*...`;
             document.getElementById('mdl-btn-wa').href = `https://wa.me/${waNumber}?text=${encodeURIComponent(waMessage)}`;
 
-            // Tampilkan Modal
             modal.classList.add('show');
         }
 
@@ -481,43 +519,93 @@
             selectedStudentId = null;
         }
 
-        // --- 6. FUNGSI TERIMA / TOLAK (TERHUBUNG KE DATABASE) ---
+        // --- 6. FUNGSI UBAH STATUS (TERIMA / TOLAK) ---
         async function prosesStatus(statusBaru) {
             if(!selectedStudentId) return;
             
             if(confirm(`Apakah Anda yakin ingin menandai pendaftar ini sebagai: ${statusBaru}?`)) {
-                
                 try {
-                    // Panggil API Backend menggunakan metode PUT
                     const res = await fetch(`/api/admin/ppdb/${selectedStudentId}/status`, {
                         method: 'PUT',
                         headers: {
                             'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${token}` // Wajib bawa token admin
+                            'Authorization': `Bearer ${token}`
                         },
                         body: JSON.stringify({ status: statusBaru })
                     });
 
                     const result = await res.json();
-
                     if (result.success) {
                         alert(`Sukses! ${result.pesan}`);
                         closeModal();
-                        
-                        // Panggil ulang fungsi load data agar tabel langsung update secara otomatis
                         loadPPDBData(); 
                     } else {
                         alert(`Gagal: ${result.pesan}`);
                     }
                 } catch (err) {
                     console.error("Gagal memproses:", err);
-                    alert("Terjadi kesalahan jaringan. Gagal terhubung ke server.");
+                    alert("Terjadi kesalahan jaringan.");
                 }
             }
         }
 
-        // --- 7. EKSEKUSI AWAL ---
-        // Segera eksekusi penarikan data saat halaman dibuka
+        // --- 7. FUNGSI HAPUS SATUAN ---
+        async function hapusSiswaTerpilih() {
+            if(!selectedStudentId) return;
+
+            if(confirm('Apakah Anda yakin ingin menghapus permanen data calon siswa ini?')) {
+                try {
+                    const res = await fetch(`/api/admin/ppdb/${selectedStudentId}`, {
+                        method: 'DELETE',
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+
+                    const result = await res.json();
+                    if(result.success) {
+                        alert(result.pesan);
+                        closeModal();
+                        loadPPDBData();
+                    } else {
+                        alert('Gagal: ' + result.pesan);
+                    }
+                } catch(err) {
+                    console.error("Error hapus:", err);
+                    alert('Terjadi kesalahan jaringan.');
+                }
+            }
+        }
+
+        // --- 8. FUNGSI RESET / HAPUS SEMUA (TAHUN AJARAN BARU) ---
+        async function confirmResetPPDB() {
+            if(confirm('⚠️ PERINGATAN KERAS!\nTindakan ini akan MENGHAPUS SELURUH DATA PENDAFTAR PPDB secara permanen untuk memulai Tahun Ajaran Baru. Data yang dihapus tidak dapat dikembalikan. Lanjutkan?')) {
+                
+                // Konfirmasi pengaman ekstra ketat
+                let keyword = prompt('Ketik kata "RESET" untuk mengonfirmasi penghapusan massal ini:');
+                if(keyword === 'RESET') {
+                    try {
+                        const res = await fetch('/api/admin/ppdb-reset', {
+                            method: 'DELETE',
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+
+                        const result = await res.json();
+                        if(result.success) {
+                            alert(result.pesan);
+                            loadPPDBData();
+                        } else {
+                            alert('Gagal: ' + result.pesan);
+                        }
+                    } catch(err) {
+                        console.error("Error reset:", err);
+                        alert('Terjadi kesalahan jaringan.');
+                    }
+                } else if(keyword !== null) {
+                    alert('Kata kunci salah! Pembatalan reset data.');
+                }
+            }
+        }
+
+        // --- EKSEKUSI AWAL ---
         loadPPDBData();
     </script>
 </body>
