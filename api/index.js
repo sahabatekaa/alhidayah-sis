@@ -172,6 +172,37 @@ app.get('/api/admin/ppdb', verifyToken, async (req, res) => {
     }
 });
 
+// Mengubah Status Pendaftar PPDB (Diterima / Ditolak / Pending)
+app.put('/api/admin/ppdb/:id/status', verifyToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+
+        // Validasi
+        if (!status) {
+            return res.status(400).json({ success: false, pesan: 'Status baru wajib diisi.' });
+        }
+
+        // Update data di Supabase
+        const { data, error } = await supabase
+            .from('ppdb')
+            .update({ status: status })
+            .eq('id', id)
+            .select();
+
+        if (error) throw error;
+
+        res.json({ 
+            success: true, 
+            pesan: `Status pendaftaran berhasil diubah menjadi ${status}.`,
+            data: data
+        });
+    } catch (err) {
+        console.error("Error Update Status PPDB:", err);
+        res.status(500).json({ success: false, pesan: 'Gagal mengubah status di database.' });
+    }
+});
+
 // ============================================================================
 // ENDPOINT SUPERADMIN (AUTENTIKASI & SETUP)
 // ============================================================================

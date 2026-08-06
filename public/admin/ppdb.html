@@ -481,20 +481,38 @@
             selectedStudentId = null;
         }
 
-        // --- 6. FUNGSI TERIMA / TOLAK ---
-        function prosesStatus(statusBaru) {
+        // --- 6. FUNGSI TERIMA / TOLAK (TERHUBUNG KE DATABASE) ---
+        async function prosesStatus(statusBaru) {
             if(!selectedStudentId) return;
             
-            if(confirm(`Apakah Anda yakin ingin menandai siswa ini sebagai: ${statusBaru}?`)) {
+            if(confirm(`Apakah Anda yakin ingin menandai pendaftar ini sebagai: ${statusBaru}?`)) {
                 
-                // (Saat ini masih berupa simulasi UI. Jika Anda ingin ini tersimpan ke database,
-                // kita bisa menambahkan endpoint PUT/PATCH di Node.js nanti).
-                const studentIndex = currentDataPPDB.findIndex(s => s.id === selectedStudentId);
-                currentDataPPDB[studentIndex].status = statusBaru;
-                
-                renderTable(); 
-                closeModal();  
-                alert(`Sukses! Data siswa telah diubah menjadi ${statusBaru} (Mode Simulasi UI).`);
+                try {
+                    // Panggil API Backend menggunakan metode PUT
+                    const res = await fetch(`/api/admin/ppdb/${selectedStudentId}/status`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}` // Wajib bawa token admin
+                        },
+                        body: JSON.stringify({ status: statusBaru })
+                    });
+
+                    const result = await res.json();
+
+                    if (result.success) {
+                        alert(`Sukses! ${result.pesan}`);
+                        closeModal();
+                        
+                        // Panggil ulang fungsi load data agar tabel langsung update secara otomatis
+                        loadPPDBData(); 
+                    } else {
+                        alert(`Gagal: ${result.pesan}`);
+                    }
+                } catch (err) {
+                    console.error("Gagal memproses:", err);
+                    alert("Terjadi kesalahan jaringan. Gagal terhubung ke server.");
+                }
             }
         }
 
