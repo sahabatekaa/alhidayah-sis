@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Galeri - CMS Yayasan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f1f5f9; display: flex; overflow-x: hidden; }
+        #sidebar-container { position: fixed; top: 0; left: 0; z-index: 40; transition: transform 0.3s; }
+        #main-content { margin-left: 260px; padding: 40px; width: calc(100% - 260px); box-sizing: border-box; min-height: 100vh; }
+        
+        .header { margin-bottom: 30px; }
+        .header h1 { margin: 0; font-size: 1.8rem; color: #0f172a; }
+        
+        .card { background: white; padding: 25px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); margin-bottom: 30px; }
+        .card-header { font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 10px; }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 700; color: #64748b; margin-bottom: 8px; text-transform: uppercase; }
+        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-family: inherit; font-size: 0.95rem; box-sizing: border-box; transition: 0.3s; }
+        
+        .btn-submit { background: #3b82f6; color: white; border: none; padding: 14px 24px; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 10px; transition: 0.2s; }
+        .btn-submit:hover { background: #2563eb; }
+
+        /* Gaya Grid Galeri CMS */
+        .gallery-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; margin-top: 20px; }
+        .gallery-item { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden; position: relative; transition: 0.3s; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .gallery-item:hover { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); transform: translateY(-3px); }
+        .gallery-img { width: 100%; height: 160px; object-fit: cover; display: block; }
+        .gallery-info { padding: 15px; }
+        .gallery-title { font-weight: 700; color: #0f172a; font-size: 0.9rem; margin: 0 0 5px 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .gallery-category { font-size: 0.75rem; color: #10b981; font-weight: 600; background: #dcfce7; padding: 3px 8px; border-radius: 10px; display: inline-block;}
+        
+        .btn-delete { background: #ef4444; color: white; border: none; padding: 8px; border-radius: 50%; cursor: pointer; position: absolute; top: 10px; right: 10px; width: 35px; height: 35px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; box-shadow: 0 2px 5px rgba(0,0,0,0.2); transition: 0.2s;}
+        .btn-delete:hover { background: #dc2626; transform: scale(1.1); }
+
+        @media (max-width: 768px) {
+            #main-content { margin-left: 0; width: 100%; padding: 20px; }
+            #sidebar-container { transform: translateX(-100%); }
+            .form-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar-container"></div>
+
+    <main id="main-content">
+        <div class="header">
+            <h1>Kelola Galeri Kegiatan</h1>
+            <p style="color: #64748b; margin-top: 5px;">Unggah foto kegiatan SD IT, PAUD, Fasilitas, dan Prestasi.</p>
+        </div>
+
+        <!-- FORM UNGGAH FOTO -->
+        <div class="card">
+            <div class="card-header"><i class="ph-bold ph-upload-simple" style="color: #3b82f6;"></i> Unggah Foto Baru</div>
+            <form id="formGaleri">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Judul / Deskripsi Singkat</label>
+                        <input type="text" id="judul" placeholder="Contoh: Fieldtrip PAUD ke Kebun Binatang" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Kategori Album</label>
+                        <select id="kategori" required>
+                            <option value="Kegiatan PAUD">Kegiatan PAUD</option>
+                            <option value="Kegiatan SD IT">Kegiatan SD IT</option>
+                            <option value="Fasilitas">Fasilitas Sekolah</option>
+                            <option value="Pentas Seni">Pentas Seni</option>
+                            <option value="Prestasi">Prestasi & Lomba</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label>File Foto Gambar (Otomatis menyesuaikan)</label>
+                        <input type="file" id="file_gambar" accept="image/*" required style="padding: 9px;">
+                    </div>
+                </div>
+                <button type="submit" id="btnSubmit" class="btn-submit">
+                    <i class="ph-bold ph-images"></i> Simpan ke Galeri
+                </button>
+            </form>
+        </div>
+
+        <!-- DAFTAR GALERI (GRID) -->
+        <div class="card">
+            <div class="card-header"><i class="ph-bold ph-image-square" style="color: #10b981;"></i> Koleksi Galeri Anda</div>
+            <div id="gallery-container" class="gallery-grid">
+                <!-- Data akan dimuat disini oleh JS -->
+                <p style="color: #64748b; grid-column: 1/-1; text-align: center;">Memuat foto...</p>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        const token = localStorage.getItem('cms_token');
+        if (!token) window.location.href = '/admin/login.html';
+
+        fetch('/admin/components/sidebar.html')
+            .then(res => res.text())
+            .then(data => { if (!data.includes('<html')) document.getElementById('sidebar-container').innerHTML = data; });
+
+        // Load Data Galeri
+        async function loadGaleri() {
+            try {
+                const res = await fetch('/api/galeri');
+                const result = await res.json();
+                const container = document.getElementById('gallery-container');
+                container.innerHTML = '';
+
+                if (result.success && result.data.length > 0) {
+                    result.data.forEach(item => {
+                        const card = document.createElement('div');
+                        card.className = 'gallery-item';
+                        card.innerHTML = `
+                            <button onclick="deleteFoto(${item.id})" class="btn-delete" title="Hapus Foto"><i class="ph-bold ph-trash"></i></button>
+                            <img src="${item.gambar_url}" alt="${item.judul}" class="gallery-img">
+                            <div class="gallery-info">
+                                <span class="gallery-category">${item.kategori}</span>
+                                <h3 class="gallery-title" title="${item.judul}">${item.judul}</h3>
+                            </div>
+                        `;
+                        container.appendChild(card);
+                    });
+                } else {
+                    container.innerHTML = '<p style="color: #64748b; grid-column: 1/-1; text-align: center;">Belum ada foto di galeri.</p>';
+                }
+            } catch (err) { console.error("Error:", err); }
+        }
+
+        // Upload Foto
+        document.getElementById('formGaleri').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btnSubmit = document.getElementById('btnSubmit');
+            btnSubmit.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Mengunggah...';
+            btnSubmit.disabled = true;
+
+            const formData = new FormData();
+            formData.append('judul', document.getElementById('judul').value);
+            formData.append('kategori', document.getElementById('kategori').value);
+            formData.append('file_gambar', document.getElementById('file_gambar').files[0]);
+
+            try {
+                const res = await fetch('/api/admin/galeri', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` },
+                    body: formData
+                });
+                const result = await res.json();
+                if (result.success) {
+                    alert('Foto berhasil diunggah!');
+                    document.getElementById('formGaleri').reset();
+                    loadGaleri();
+                } else {
+                    alert('Gagal: ' + result.pesan);
+                }
+            } catch (err) { alert('Terjadi kesalahan sistem.'); }
+            finally {
+                btnSubmit.innerHTML = '<i class="ph-bold ph-images"></i> Simpan ke Galeri';
+                btnSubmit.disabled = false;
+            }
+        });
+
+        // Hapus Foto
+        async function deleteFoto(id) {
+            if (!confirm('Yakin ingin menghapus foto ini secara permanen?')) return;
+            try {
+                const res = await fetch(`/api/admin/galeri/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+                const result = await res.json();
+                if (result.success) loadGaleri();
+            } catch (err) { alert('Gagal menghapus foto.'); }
+        }
+
+        loadGaleri(); // Panggil fungsi saat halaman dimuat
+    </script>
+</body>
+</html>

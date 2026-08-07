@@ -6,6 +6,43 @@
     <title>Galeri - Yayasan Al-Hidayah Amansari</title>
     <link rel="stylesheet" href="/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* CSS Tambahan untuk Tombol Navigasi Kiri-Kanan pada Lightbox */
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(15, 23, 42, 0.6);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.2);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            z-index: 1001;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(4px);
+        }
+        .lightbox-nav:hover { background: var(--primary-color); border-color: white; transform: translateY(-50%) scale(1.1); }
+        .lightbox-prev { left: 30px; }
+        .lightbox-next { right: 30px; }
+
+        /* Mencegah gambar pop-up melebar tak beraturan */
+        #lightbox-img { transition: opacity 0.3s ease; }
+        
+        /* Animasi Transisi Filter */
+        .gallery-item-wrap { transition: transform 0.4s ease, opacity 0.4s ease; }
+        
+        @media (max-width: 768px) {
+            .lightbox-nav { width: 40px; height: 40px; font-size: 1.2rem; }
+            .lightbox-prev { left: 10px; }
+            .lightbox-next { right: 10px; }
+        }
+    </style>
 </head>
 <body>
 
@@ -23,103 +60,37 @@
 
         <section class="section-container">
             
-            <!-- FILTER KATEGORI -->
+            <!-- FILTER KATEGORI (Value disesuaikan persis dengan opsi di CMS) -->
             <div class="gallery-filter-container">
-                <button class="filter-btn active" data-filter="all">Semua Foto</button>
-                <button class="filter-btn" data-filter="paud">Kegiatan PAUD</button>
-                <button class="filter-btn" data-filter="sdit">Kegiatan SD IT</button>
-                <button class="filter-btn" data-filter="fasilitas">Fasilitas</button>
+                <button class="filter-btn active" data-filter="Semua">Semua Foto</button>
+                <button class="filter-btn" data-filter="Kegiatan PAUD">Kegiatan PAUD</button>
+                <button class="filter-btn" data-filter="Kegiatan SD IT">Kegiatan SD IT</button>
+                <button class="filter-btn" data-filter="Fasilitas Sekolah">Fasilitas</button>
+                <button class="filter-btn" data-filter="Pentas Seni">Pentas Seni</button>
+                <button class="filter-btn" data-filter="Prestasi & Lomba">Prestasi</button>
             </div>
 
-            <!-- GRID GALERI -->
+            <!-- GRID GALERI (DINAMIS) -->
             <div class="gallery-masonry-grid" id="gallery-container">
-                
-                <!-- Item 1 (Kategori: PAUD) -->
-                <div class="gallery-item-wrap" data-category="paud">
-                    <div class="gallery-item">
-                        <img src="https://picsum.photos/600/600?random=101" alt="Kegiatan Belajar PAUD">
-                        <div class="gallery-overlay">
-                            <span class="gallery-tag">PAUD</span>
-                            <h3 class="gallery-caption">Belajar Mewarnai Bersama</h3>
-                            <button class="zoom-btn"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
-                        </div>
-                    </div>
+                <!-- Status Loading -->
+                <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: #64748b;">
+                    <i class="fa-solid fa-spinner fa-spin fa-3x"></i>
+                    <p style="margin-top: 15px; font-weight: 500;">Memuat album galeri...</p>
                 </div>
-
-                <!-- Item 2 (Kategori: SDIT) -->
-                <div class="gallery-item-wrap" data-category="sdit">
-                    <div class="gallery-item">
-                        <img src="https://picsum.photos/600/400?random=102" alt="Sholat Berjamaah SD IT">
-                        <div class="gallery-overlay">
-                            <span class="gallery-tag gold">SD IT</span>
-                            <h3 class="gallery-caption">Pembiasaan Sholat Dhuha</h3>
-                            <button class="zoom-btn"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Item 3 (Kategori: SDIT) -->
-                <div class="gallery-item-wrap" data-category="sdit">
-                    <div class="gallery-item">
-                        <img src="https://picsum.photos/600/800?random=103" alt="Pramuka SIT">
-                        <div class="gallery-overlay">
-                            <span class="gallery-tag gold">SD IT</span>
-                            <h3 class="gallery-caption">Kegiatan Pramuka SIT</h3>
-                            <button class="zoom-btn"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Item 4 (Kategori: Fasilitas) -->
-                <div class="gallery-item-wrap" data-category="fasilitas">
-                    <div class="gallery-item">
-                        <img src="https://picsum.photos/600/450?random=104" alt="Gedung Sekolah">
-                        <div class="gallery-overlay">
-                            <span class="gallery-tag blue">Fasilitas</span>
-                            <h3 class="gallery-caption">Gedung Utama Yayasan</h3>
-                            <button class="zoom-btn"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Item 5 (Kategori: PAUD) -->
-                <div class="gallery-item-wrap" data-category="paud">
-                    <div class="gallery-item">
-                        <img src="https://picsum.photos/600/500?random=105" alt="Bermain PAUD">
-                        <div class="gallery-overlay">
-                            <span class="gallery-tag">PAUD</span>
-                            <h3 class="gallery-caption">Keseruan Bermain di Playground</h3>
-                            <button class="zoom-btn"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Item 6 (Kategori: SDIT) -->
-                <div class="gallery-item-wrap" data-category="sdit">
-                    <div class="gallery-item">
-                        <img src="https://picsum.photos/600/600?random=106" alt="Tahfidz SD IT">
-                        <div class="gallery-overlay">
-                            <span class="gallery-tag gold">SD IT</span>
-                            <h3 class="gallery-caption">Ujian Setoran Hafalan Qur'an</h3>
-                            <button class="zoom-btn"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-            
-            <!-- Tombol Load More (Untuk CMS) -->
-            <div style="text-align: center; margin-top: 3rem;">
-                <a href="#" class="btn-primary" style="background: var(--text-muted);"><i class="fa-solid fa-spinner"></i> Muat Lebih Banyak</a>
             </div>
 
         </section>
 
     </main>
 
-    <!-- LIGHTBOX MODAL (Untuk Fitur Pop-Up Gambar) -->
+    <!-- LIGHTBOX MODAL DENGAN NAVIGASI NEXT/PREV -->
     <div class="lightbox-modal" id="lightbox">
-        <span class="lightbox-close">&times;</span>
+        <span class="lightbox-close" title="Tutup">&times;</span>
+        
+        <!-- Tombol Geser -->
+        <div class="lightbox-nav lightbox-prev" id="btn-prev"><i class="fa-solid fa-chevron-left"></i></div>
+        <div class="lightbox-nav lightbox-next" id="btn-next"><i class="fa-solid fa-chevron-right"></i></div>
+        
         <div class="lightbox-content">
             <img src="" alt="Zoom Image" id="lightbox-img">
             <h3 id="lightbox-caption">Caption Disini</h3>
@@ -130,29 +101,100 @@
     <div id="footer-placeholder"></div>
 
     <script src="/js/main.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // ==========================================
-            // 1. LOGIKA FILTER GALERI
-            // ==========================================
-            const filterBtns = document.querySelectorAll('.filter-btn');
-            const galleryItems = document.querySelectorAll('.gallery-item-wrap');
+    <script src="/js/global-settings.js"></script>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            
+            const container = document.getElementById('gallery-container');
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            
+            let allGalleryData = [];       // Menyimpan seluruh foto dari DB
+            let currentFilteredData = [];  // Menyimpan foto yang sedang difilter (Untuk urutan Next/Prev)
+            let currentLightboxIndex = 0;  // Index foto yang sedang dibuka
+
+            // ==========================================
+            // 1. FETCH DATA DARI API (SUPABASE)
+            // ==========================================
+            try {
+                const res = await fetch('/api/galeri');
+                const result = await res.json();
+                
+                if (result.success && result.data.length > 0) {
+                    allGalleryData = result.data;
+                    currentFilteredData = result.data; // Awalnya semua foto tampil
+                    renderGallery(allGalleryData);
+                } else {
+                    container.innerHTML = `
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; border-radius: 16px; background: #f8fafc; border: 2px dashed #cbd5e1;">
+                            <i class="fa-regular fa-image fa-4x" style="color: #94a3b8; margin-bottom: 15px;"></i>
+                            <h3 style="color: #475569; margin-bottom: 5px;">Album Masih Kosong</h3>
+                            <p style="color: #64748b;">Belum ada dokumentasi kegiatan yang diunggah ke galeri.</p>
+                        </div>
+                    `;
+                }
+            } catch (err) {
+                console.error("Gagal memuat galeri:", err);
+                container.innerHTML = '<p style="grid-column: 1 / -1; text-align: center; color: #ef4444;">Gagal terhubung ke server database.</p>';
+            }
+
+            // ==========================================
+            // 2. FUNGSI RENDER HTML CARD
+            // ==========================================
+            function renderGallery(dataList) {
+                container.innerHTML = ''; // Bersihkan container
+                
+                dataList.forEach(item => {
+                    // Beri warna tag kategori yang berbeda-beda agar menarik
+                    let tagClass = "";
+                    if(item.kategori === 'Kegiatan SD IT') tagClass = 'gold';
+                    if(item.kategori === 'Fasilitas Sekolah') tagClass = 'blue';
+                    if(item.kategori === 'Prestasi & Lomba') tagClass = 'red';
+                    if(item.kategori === 'Pentas Seni') tagClass = 'purple'; // Pastikan warna CSS ini ada atau default
+
+                    const card = `
+                        <div class="gallery-item-wrap" data-category="${item.kategori}" data-id="${item.id}">
+                            <div class="gallery-item">
+                                <img src="${item.gambar_url}" alt="${item.judul}">
+                                <div class="gallery-overlay">
+                                    <span class="gallery-tag ${tagClass}">${item.kategori}</span>
+                                    <h3 class="gallery-caption">${item.judul}</h3>
+                                    <button class="zoom-btn"><i class="fa-solid fa-magnifying-glass-plus"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.innerHTML += card;
+                });
+
+                bindLightboxEvents(); // Pasang klik detektor pada foto yang baru dirender
+            }
+
+            // ==========================================
+            // 3. LOGIKA FILTER MASONRY
+            // ==========================================
             filterBtns.forEach(btn => {
                 btn.addEventListener('click', function() {
-                    // Hapus class active dari semua tombol, lalu tambahkan ke yang diklik
                     filterBtns.forEach(b => b.classList.remove('active'));
                     this.classList.add('active');
 
                     const filterValue = this.getAttribute('data-filter');
+                    
+                    // Filter Data Array agar Next/Prev Lightbox tidak melenceng ke kategori lain
+                    if (filterValue === 'Semua') {
+                        currentFilteredData = allGalleryData;
+                    } else {
+                        currentFilteredData = allGalleryData.filter(item => item.kategori === filterValue);
+                    }
 
+                    const galleryItems = document.querySelectorAll('.gallery-item-wrap');
+                    
                     galleryItems.forEach(item => {
-                        // Animasi sembunyi/tampil
                         item.style.transform = "scale(0.8)";
                         item.style.opacity = "0";
                         
                         setTimeout(() => {
-                            if (filterValue === 'all' || item.getAttribute('data-category') === filterValue) {
+                            if (filterValue === 'Semua' || item.getAttribute('data-category') === filterValue) {
                                 item.style.display = "block";
                                 setTimeout(() => {
                                     item.style.transform = "scale(1)";
@@ -161,47 +203,84 @@
                             } else {
                                 item.style.display = "none";
                             }
-                        }, 300); // Waktu yang sama dengan CSS transition
+                        }, 300);
                     });
                 });
             });
 
             // ==========================================
-            // 2. LOGIKA LIGHTBOX (POP-UP FOTO)
+            // 4. LOGIKA LIGHTBOX & NAVIGASI (NEXT/PREV)
             // ==========================================
             const lightbox = document.getElementById('lightbox');
             const lightboxImg = document.getElementById('lightbox-img');
             const lightboxCaption = document.getElementById('lightbox-caption');
             const closeBtn = document.querySelector('.lightbox-close');
-            const zoomBtns = document.querySelectorAll('.gallery-item');
-
-            // Buka Lightbox saat foto diklik
-            zoomBtns.forEach(item => {
-                item.addEventListener('click', function() {
-                    const imgUrl = this.querySelector('img').src;
-                    const caption = this.querySelector('.gallery-caption').textContent;
-                    
-                    lightboxImg.src = imgUrl;
-                    lightboxCaption.textContent = caption;
-                    lightbox.classList.add('active');
-                    document.body.style.overflow = "hidden"; // Kunci scroll halaman belakang
+            
+            function bindLightboxEvents() {
+                const zoomBtns = document.querySelectorAll('.gallery-item');
+                
+                zoomBtns.forEach(item => {
+                    item.addEventListener('click', function() {
+                        // Cari Index foto ini di dalam currentFilteredData
+                        const parentWrap = this.closest('.gallery-item-wrap');
+                        const fotoId = parseInt(parentWrap.getAttribute('data-id'));
+                        
+                        currentLightboxIndex = currentFilteredData.findIndex(f => f.id === fotoId);
+                        
+                        tampilkanKeLightbox(currentLightboxIndex);
+                        lightbox.classList.add('active');
+                        document.body.style.overflow = "hidden"; // Matikan scroll halaman belakang
+                    });
                 });
+            }
+
+            function tampilkanKeLightbox(index) {
+                // Efek fade-in halus saat berganti foto
+                lightboxImg.style.opacity = '0';
+                
+                setTimeout(() => {
+                    const dataFoto = currentFilteredData[index];
+                    lightboxImg.src = dataFoto.gambar_url;
+                    lightboxCaption.textContent = dataFoto.judul;
+                    lightboxImg.style.opacity = '1';
+                }, 200);
+            }
+
+            // Tombol Next (Kanan)
+            document.getElementById('btn-next').addEventListener('click', (e) => {
+                e.stopPropagation(); // Agar lightbox tidak tertutup saat mengklik panah
+                currentLightboxIndex = (currentLightboxIndex + 1) % currentFilteredData.length;
+                tampilkanKeLightbox(currentLightboxIndex);
             });
 
-            // Tutup Lightbox saat tombol (X) diklik
+            // Tombol Prev (Kiri)
+            document.getElementById('btn-prev').addEventListener('click', (e) => {
+                e.stopPropagation();
+                currentLightboxIndex = (currentLightboxIndex - 1 + currentFilteredData.length) % currentFilteredData.length;
+                tampilkanKeLightbox(currentLightboxIndex);
+            });
+
+            // Fungsi Tutup
+            function closeLightbox() {
+                lightbox.classList.remove('active');
+                document.body.style.overflow = "auto";
+            }
+            
             closeBtn.addEventListener('click', closeLightbox);
             
-            // Tutup Lightbox saat area luar foto diklik
             lightbox.addEventListener('click', function(e) {
-                if (e.target === lightbox) {
-                    closeLightbox();
+                if (e.target === lightbox) closeLightbox();
+            });
+            
+            // Tutup pakai tombol ESC & Navigasi Panah Keyboard
+            document.addEventListener('keydown', (e) => {
+                if (lightbox.classList.contains('active')) {
+                    if (e.key === 'Escape') closeLightbox();
+                    if (e.key === 'ArrowRight') document.getElementById('btn-next').click();
+                    if (e.key === 'ArrowLeft') document.getElementById('btn-prev').click();
                 }
             });
 
-            function closeLightbox() {
-                lightbox.classList.remove('active');
-                document.body.style.overflow = "auto"; // Buka kembali scroll halaman belakang
-            }
         });
     </script>
 </body>

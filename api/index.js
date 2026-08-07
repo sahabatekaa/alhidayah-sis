@@ -490,6 +490,63 @@ app.delete('/api/admin/berita/:id', verifyToken, async (req, res) => {
 });
 
 // ============================================================================
+// ENDPOINT GALERI KEGIATAN & FASILITAS
+// ============================================================================
+
+// 1. [PUBLIK & ADMIN] Mengambil Semua Foto (Dengan opsi filter kategori)
+app.get('/api/galeri', async (req, res) => {
+    try {
+        const { kategori } = req.query;
+        let query = supabase.from('galeri').select('*').order('created_at', { ascending: false });
+        
+        if (kategori && kategori !== 'Semua') {
+            query = query.eq('kategori', kategori);
+        }
+
+        const { data, error } = await query;
+        if (error) throw error;
+        res.json({ success: true, data: data });
+    } catch (err) {
+        res.status(500).json({ success: false, pesan: 'Gagal memuat galeri foto.' });
+    }
+});
+
+// 2. [ADMIN] Upload Foto ke Galeri
+app.post('/api/admin/galeri', verifyToken, upload.single('file_gambar'), async (req, res) => {
+    try {
+        const { judul, kategori } = req.body;
+        const fileGambar = req.file;
+
+        if (!fileGambar) return res.status(400).json({ success: false, pesan: "File foto wajib diunggah." });
+
+        // Upload ke Supabase Storage (Menggunakan folder 'galeri')
+        const gambarUrl = await uploadToSupabaseStorage(fileGambar, 'galeri', `foto_${Date.now()}`);
+
+        const { error } = await supabase.from('galeri').insert([{
+            judul, kategori, gambar_url: gambarUrl
+        }]);
+
+        if (error) throw error;
+        res.status(201).json({ success: true, pesan: 'Foto berhasil ditambahkan ke Galeri!' });
+    } catch (err) {
+        console.error("Error Upload Galeri:", err);
+        res.status(500).json({ success: false, pesan: 'Gagal mengunggah foto.' });
+    }
+});
+
+// 3. [ADMIN] Hapus Foto dari Galeri
+app.delete('/api/admin/galeri/:id', verifyToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { error } = await supabase.from('galeri').delete().eq('id', id);
+        if (error) throw error;
+        res.json({ success: true, pesan: 'Foto berhasil dihapus.' });
+    } catch (err) {
+        res.status(500).json({ success: false, pesan: 'Gagal menghapus foto.' });
+    }
+});
+
+//   ============================================================================
 // FALLBACK ROUTE / 404 HANDLER -> POSISI WAJIB PALING BAWAH
 // ============================================================================
 app.use((req, res) => {
