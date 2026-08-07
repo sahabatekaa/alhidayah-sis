@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informasi & Pengumuman - Yayasan Al-Hidayah Amansari</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Header Placeholder -->
+    <div id="header-placeholder"></div>
+
+    <main>
+        <!-- HEADER HALAMAN -->
+        <section class="page-header info-header">
+            <div class="header-content">
+                <h1>Pusat Informasi & Berita</h1>
+                <p>Ikuti kabar terbaru, pengumuman resmi, dan kegiatan dari Yayasan Al-Hidayah Amansari.</p>
+            </div>
+        </section>
+
+        <section class="section-container">
+            <div class="news-page-layout">
+                
+                <!-- ==========================================
+                     KOLOM KIRI: DAFTAR BERITA (DINAMIS DARI CMS)
+                     ========================================== -->
+                <div class="main-news-section">
+                    <div class="section-header-flex" style="margin-bottom: 2rem;">
+                        <h2 class="section-title" style="margin-bottom: 0; text-align: left;">Berita Terbaru</h2>
+                    </div>
+
+                    <div class="news-grid-modern" id="news-grid-container">
+                        <!-- Teks Loading Sementara -->
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 40px; color: #64748b;">
+                            <i class="fa-solid fa-spinner fa-spin fa-2x"></i>
+                            <p style="margin-top: 10px;">Memuat berita terbaru...</p>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="pagination" id="news-pagination" style="display: none;">
+                        <a href="#" class="page-link prev-next disabled"><i class="fa-solid fa-chevron-left"></i> Prev</a>
+                        <a href="#" class="page-link active">1</a>
+                        <a href="#" class="page-link prev-next">Next <i class="fa-solid fa-chevron-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- ==========================================
+                     KOLOM KANAN: SIDEBAR PENGUMUMAN & KATEGORI
+                     ========================================== -->
+                <aside class="sidebar-section">
+                    
+                    <!-- Widget Pengumuman Penting (Akan diisi dinamis oleh JS) -->
+                    <div class="sidebar-widget announcement-widget">
+                        <h3 class="widget-title"><i class="fa-solid fa-bullhorn"></i> Pengumuman Penting</h3>
+                        <div class="announcement-list">
+                            <!-- Placeholder loading -->
+                            <p style="text-align: center; color: #64748b; font-size: 0.9rem; padding: 10px;">Memuat pengumuman...</p>
+                        </div>
+                    </div>
+
+                    <!-- Widget Kategori (Filter Berita) -->
+                    <div class="sidebar-widget">
+                        <h3 class="widget-title"><i class="fa-solid fa-tags"></i> Kategori Berita</h3>
+                        <ul class="category-list">
+                            <li><a href="/berita.html?kategori=Kegiatan">Kegiatan Sekolah</a></li>
+                            <li><a href="/berita.html?kategori=Prestasi">Prestasi Siswa</a></li>
+                            <li><a href="/berita.html?kategori=Pengumuman">Pengumuman Resmi</a></li>
+                            <li><a href="/berita.html?kategori=SD IT">Kabar SD IT</a></li>
+                            <li><a href="/berita.html?kategori=PAUD">Kabar PAUD</a></li>
+                        </ul>
+                    </div>
+
+                </aside>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer Placeholder -->
+    <div id="footer-placeholder"></div>
+
+    <script src="/js/main.js"></script>
+    <script src="/js/global-settings.js"></script>
+
+    <!-- SCRIPT KHUSUS HALAMAN BERITA (SUDAH DIUPGRADE) -->
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const container = document.getElementById('news-grid-container');
+            const pengumumanContainer = document.querySelector('.announcement-list');
+            if (!container) return;
+
+                        // 1. Cek Filter Kategori URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const kategoriFilter = urlParams.get('kategori');
+            
+            let apiUrl = '/api/berita';
+            if (kategoriFilter) {
+                apiUrl += `?kategori=${encodeURIComponent(kategoriFilter)}`;
+                
+                // --- PERBAIKAN UI FILTER YANG JAUH LEBIH RAPI ---
+                const headerFlex = document.querySelector('.section-header-flex');
+                
+                // Pastikan pembungkusnya menggunakan flexbox agar sejajar
+                headerFlex.style.display = 'flex';
+                headerFlex.style.alignItems = 'center';
+                headerFlex.style.justifyContent = 'space-between';
+                headerFlex.style.flexWrap = 'wrap';
+                headerFlex.style.gap = '10px';
+                
+                // Tambahkan elemen filter di luar h2 (sebagai elemen mandiri)
+                headerFlex.insertAdjacentHTML('beforeend', `
+                    <div style="background: #f1f5f9; border: 1px solid #cbd5e1; color: #475569; font-size: 0.85rem; font-weight: 600; padding: 6px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 8px;">
+                        <span>Menampilkan Kategori: <span style="color: var(--primary-color);">${kategoriFilter}</span></span>
+                        <a href="/berita.html" style="color: #ef4444; display: flex; align-items: center; justify-content: center; background: #fee2e2; border-radius: 50%; width: 22px; height: 22px; text-decoration: none; transition: 0.2s;" title="Hapus Filter">
+                            <i class="fa-solid fa-xmark" style="font-size: 0.8rem;"></i>
+                        </a>
+                    </div>
+                `);
+            }
+
+            // ==========================================
+            // A. TARIK DATA BERITA UTAMA (KIRI)
+            // ==========================================
+            try {
+                const res = await fetch(apiUrl);
+                const result = await res.json();
+
+                if (result.success && result.data.length > 0) {
+                    container.innerHTML = ''; 
+                    
+                    result.data.forEach(berita => {
+                        const d = new Date(berita.created_at);
+                        const tglFormat = d.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' });
+
+                        // Perbaikan pemotongan teks dari HTML (mencegah undefined)
+                        let excerpt = 'Klik judul untuk membaca selengkapnya...';
+                        if (berita.konten) {
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = berita.konten;
+                            const textOnly = tempDiv.textContent || tempDiv.innerText || '';
+                            const cleanText = textOnly.trim();
+                            if (cleanText.length > 0) {
+                                excerpt = cleanText.length > 120 ? cleanText.substring(0, 120) + '...' : cleanText;
+                            }
+                        }
+
+                        const urlDetail = `/baca-berita.html?slug=${berita.slug}`;
+
+                        const card = `
+                            <article class="news-card-cms">
+                                <div class="news-thumb">
+                                    <span class="news-category">${berita.kategori}</span>
+                                    <a href="${urlDetail}">
+                                        <img src="${berita.foto_cover}" alt="${berita.judul}" style="width: 100%; height: 200px; object-fit: cover;">
+                                    </a>
+                                </div>
+                                <div class="news-content">
+                                    <div class="news-meta">
+                                        <span><i class="fa-regular fa-calendar"></i> ${tglFormat}</span>
+                                        <span><i class="fa-regular fa-user"></i> ${berita.penulis}</span>
+                                    </div>
+                                    <h3 class="news-title">
+                                        <a href="${urlDetail}" style="color: #0f172a; text-decoration: none;">${berita.judul}</a>
+                                    </h3>
+                                    <p class="news-excerpt" style="color: #64748b; font-size: 0.95rem; line-height: 1.6;">${excerpt}</p>
+                                    <a href="${urlDetail}" class="read-more">Baca Selengkapnya <i class="fa-solid fa-arrow-right"></i></a>
+                                </div>
+                            </article>
+                        `;
+                        container.innerHTML += card;
+                    });
+                } else {
+                    container.innerHTML = `
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 50px; background: #f8fafc; border-radius: 12px; border: 1px dashed #cbd5e1;">
+                            <i class="fa-regular fa-folder-open fa-3x" style="color: #94a3b8; margin-bottom: 15px;"></i>
+                            <h3 style="color: #475569; margin-bottom: 5px;">Belum ada publikasi</h3>
+                            <p style="color: #64748b;">Belum ada artikel yang diterbitkan${kategoriFilter ? ' untuk kategori ini' : ''}.</p>
+                            ${kategoriFilter ? '<a href="/berita.html" style="color: var(--primary-color); font-weight: bold; text-decoration: none; margin-top:10px; display:inline-block;">&larr; Lihat semua berita</a>' : ''}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error fetching berita:', error);
+                container.innerHTML = '<p style="text-align:center; grid-column: 1/-1; color: #ef4444; padding: 20px;">Gagal memuat berita. Periksa koneksi ke server.</p>';
+            }
+
+            // ==========================================
+            // B. TARIK DATA PENGUMUMAN SIDEBAR (KANAN)
+            // ==========================================
+            if (pengumumanContainer) {
+                try {
+                    // Hanya tarik berita dengan kategori "Pengumuman"
+                    const resPengumuman = await fetch('/api/berita?kategori=Pengumuman');
+                    const resultPengumuman = await resPengumuman.json();
+
+                    if (resultPengumuman.success && resultPengumuman.data.length > 0) {
+                        pengumumanContainer.innerHTML = ''; // Hapus tulisan memuat
+                        
+                        // Ambil maksimal 3 pengumuman terbaru
+                        const topPengumuman = resultPengumuman.data.slice(0, 3);
+                        
+                        topPengumuman.forEach(p => {
+                            const d = new Date(p.created_at);
+                            const tgl = d.getDate().toString().padStart(2, '0');
+                            const bln = d.toLocaleString('id-ID', { month: 'short' }).toUpperCase();
+                            const urlDetail = `/baca-berita.html?slug=${p.slug}`;
+
+                            pengumumanContainer.innerHTML += `
+                                <a href="${urlDetail}" class="announcement-item" style="text-decoration: none; display: flex; align-items: center; margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid #e2e8f0;">
+                                    <div class="announce-date" style="background: var(--primary-color); color: white; padding: 10px; border-radius: 8px; text-align: center; min-width: 55px;">
+                                        <span class="day" style="display: block; font-size: 1.2rem; font-weight: bold;">${tgl}</span>
+                                        <span class="month" style="display: block; font-size: 0.75rem;">${bln}</span>
+                                    </div>
+                                    <div class="announce-text" style="margin-left: 15px;">
+                                        <h4 style="margin: 0; color: #0f172a; font-size: 0.95rem; line-height: 1.4;">${p.judul}</h4>
+                                    </div>
+                                </a>
+                            `;
+                        });
+                    } else {
+                        pengumumanContainer.innerHTML = '<p style="padding:15px; color:#64748b; font-size:0.9rem; text-align:center;">Belum ada pengumuman penting saat ini.</p>';
+                    }
+                } catch (e) {
+                    console.error("Gagal load pengumuman sidebar", e);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

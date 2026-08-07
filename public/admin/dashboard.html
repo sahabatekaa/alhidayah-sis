@@ -41,22 +41,44 @@
         .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
         .header h1 { margin: 0; font-size: 1.8rem; color: #0f172a; }
         
-        /* Grid Kartu */
-        .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
-        .card { 
+        /* Banner Ucapan Selamat Datang */
+        .welcome-banner { 
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); 
+            border-radius: 20px; 
+            padding: 30px; 
+            color: white; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 30px; 
+            box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.3); 
+        }
+        .welcome-text h2 { margin: 0 0 10px 0; font-size: 1.8rem; }
+        .welcome-text p { margin: 0; color: #94a3b8; font-size: 1rem; line-height: 1.5; }
+        .welcome-icon { font-size: 5rem; color: #38bdf8; opacity: 0.8; }
+
+        /* Grid Statistik Dinamis */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { 
             background: white; 
             padding: 24px; 
             border-radius: 16px; 
-            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.02); 
-            border: 1px solid #e2e8f0;
-            transition: transform 0.3s;
+            border: 1px solid #e2e8f0; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); 
+            display: flex; 
+            align-items: center; 
+            gap: 20px; 
+            transition: transform 0.2s; 
         }
-        .card:hover { transform: translateY(-5px); }
+        .stat-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
+        
+        .stat-icon { width: 60px; height: 60px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; }
+        .stat-info span { display: block; color: #64748b; font-size: 0.9rem; font-weight: 500; margin-bottom: 5px; }
+        .stat-info h3 { margin: 0; font-size: 1.8rem; color: #0f172a; }
 
         /* =========================================
            TOMBOL MELAYANG (FLOATING ACTIONS)
            ========================================= */
-        /* Tombol Hamburger Kiri Bawah (Tersembunyi di Desktop) */
         .fab-menu {
             display: none;
             position: fixed;
@@ -78,7 +100,6 @@
         }
         .fab-menu:active { transform: scale(0.9); }
 
-        /* Tombol Live Chat Kanan Bawah (Muncul di semua ukuran) */
         .fab-chat {
             position: fixed;
             bottom: 24px;
@@ -106,15 +127,11 @@
         @media (max-width: 768px) {
             #main-content { margin-left: 0; width: 100%; padding: 20px; padding-bottom: 100px; }
             .header { flex-direction: column; align-items: flex-start; gap: 10px; }
-            
-            /* Sidebar disembunyikan di luar layar sebelah kiri */
             #sidebar-container { transform: translateX(-100%); }
-            
-            /* Class ini akan ditambahkan via JS saat tombol menu diklik */
             #sidebar-container.show-sidebar { transform: translateX(0); box-shadow: 10px 0 25px rgba(0,0,0,0.5); }
-            
-            /* Tampilkan Hamburger Menu */
             .fab-menu { display: flex; }
+            .welcome-banner { flex-direction: column; text-align: center; gap: 20px; }
+            .welcome-icon { display: none; }
         }
     </style>
 </head>
@@ -137,29 +154,58 @@
     <main id="main-content">
         <div class="header">
             <div>
-                <h1>Selamat Datang 👋</h1>
-                <p style="color: #64748b; margin-top: 5px; font-size: 0.95rem;">Pantau dan kelola data yayasan hari ini.</p>
+                <h1>Dashboard Utama</h1>
+                <p style="color: #64748b; margin-top: 5px; font-size: 0.95rem;">Pantau dan kelola data Yayasan Al-Hidayah Amansari hari ini.</p>
             </div>
             <span id="user-display" style="padding: 8px 16px; background: #d1fae5; color: #047857; border-radius: 20px; font-weight: 600; font-size: 0.9rem;">
-                Superadmin
+                <!-- Diisi otomatis oleh JS -->
             </span>
         </div>
 
-        <div class="card-grid">
-            <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h3 style="margin:0; font-size:1.1rem;">Pendaftar PPDB</h3>
-                    <i class="ph-fill ph-users-three" style="font-size: 2rem; color: #10b981;"></i>
-                </div>
-                <p style="color: #64748b; font-size: 0.9rem; line-height: 1.6;">Kelola data calon siswa PAUD/TK IT & SDIT yang baru mendaftar hari ini.</p>
+        <!-- Banner Welcome -->
+        <div class="welcome-banner">
+            <div class="welcome-text">
+                <h2>Ahlan wa Sahlan, <span id="admin-name" style="color: #38bdf8;">Admin</span>! 👋</h2>
+                <p>Selamat datang di panel kontrol terpadu SDIT & PAUD/TK IT.<br>Semoga hari ini penuh berkah dan kemudahan dalam mengelola data sekolah.</p>
             </div>
-            
-            <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <h3 style="margin:0; font-size:1.1rem;">Artikel & Berita</h3>
-                    <i class="ph-fill ph-newspaper" style="font-size: 2rem; color: #f59e0b;"></i>
+            <div class="welcome-icon">
+                <i class="ph-fill ph-mosque"></i>
+            </div>
+        </div>
+
+        <h3 style="color: #0f172a; margin-bottom: 15px; display: flex; align-items: center; gap: 8px;">
+            <i class="ph-fill ph-folder-user" style="color: #3b82f6;"></i> Statistik PPDB Real-Time
+        </h3>
+
+        <!-- Grid Statistik (Tanpa Data Dummy, menunggu tarikan dari Server) -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #e0f2fe; color: #0284c7;"><i class="ph-fill ph-users"></i></div>
+                <div class="stat-info">
+                    <span>Total Pendaftar</span>
+                    <h3 id="stat-total">...</h3>
                 </div>
-                <p style="color: #64748b; font-size: 0.9rem; line-height: 1.6;">Publikasikan pengumuman atau kegiatan terbaru untuk wali murid.</p>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #fef3c7; color: #d97706;"><i class="ph-fill ph-hourglass-medium"></i></div>
+                <div class="stat-info">
+                    <span>Menunggu Verifikasi</span>
+                    <h3 id="stat-pending">...</h3>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #d1fae5; color: #059669;"><i class="ph-fill ph-check-circle"></i></div>
+                <div class="stat-info">
+                    <span>Siswa Diterima</span>
+                    <h3 id="stat-diterima">...</h3>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon" style="background: #fee2e2; color: #dc2626;"><i class="ph-fill ph-x-circle"></i></div>
+                <div class="stat-info">
+                    <span>Berkas Ditolak</span>
+                    <h3 id="stat-ditolak">...</h3>
+                </div>
             </div>
         </div>
     </main>
@@ -172,7 +218,12 @@
         }
 
         const user = JSON.parse(localStorage.getItem('cms_user'));
-        if(user) document.getElementById('user-display').innerText = user.full_name;
+        if(user) {
+            document.getElementById('user-display').innerText = user.full_name;
+            // Memisahkan nama depan agar sapaan di banner lebih akrab
+            const namaDepan = user.full_name.split(' ')[0];
+            document.getElementById('admin-name').innerText = namaDepan;
+        }
 
         // --- 2. LOAD SIDEBAR SECARA DINAMIS ---
         fetch('/admin/components/sidebar.html')
@@ -192,8 +243,6 @@
         
         btnToggleMenu.addEventListener('click', () => {
             sidebarContainer.classList.toggle('show-sidebar');
-            
-            // Ubah ikon dari List (garis tiga) menjadi X
             const icon = btnToggleMenu.querySelector('i');
             if (sidebarContainer.classList.contains('show-sidebar')) {
                 icon.className = 'ph ph-x';
@@ -202,7 +251,6 @@
             }
         });
 
-        // Tutup sidebar jika user men-klik area konten utama (di HP)
         document.getElementById('main-content').addEventListener('click', () => {
             if (window.innerWidth <= 768 && sidebarContainer.classList.contains('show-sidebar')) {
                 sidebarContainer.classList.remove('show-sidebar');
@@ -216,6 +264,35 @@
             localStorage.removeItem('cms_user');
             window.location.href = '/admin/login.html';
         }
+
+        // --- 5. TARIK DATA STATISTIK DARI BACKEND API ---
+        async function loadDashboardStats() {
+            try {
+                const res = await fetch('/api/admin/dashboard-stats', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await res.json();
+                
+                if (result.success) {
+                    const ppdb = result.data.ppdb;
+                    // Inject data murni dari database ke dalam HTML
+                    document.getElementById('stat-total').innerText = ppdb.total;
+                    document.getElementById('stat-pending').innerText = ppdb.pending;
+                    document.getElementById('stat-diterima').innerText = ppdb.diterima;
+                    document.getElementById('stat-ditolak').innerText = ppdb.ditolak;
+                } else {
+                    console.error("Gagal memuat statistik");
+                    // Beri indikator gagal jika server bermasalah
+                    document.getElementById('stat-total').innerText = "-";
+                    document.getElementById('stat-pending').innerText = "-";
+                }
+            } catch (err) {
+                console.error("Koneksi API error:", err);
+            }
+        }
+
+        // Langsung eksekusi penarikan data saat halaman dimuat
+        loadDashboardStats();
     </script>
 </body>
 </html>

@@ -204,6 +204,290 @@ app.get('/api/admin/setup', async (req, res) => {
     }
 });
 
+// ============================================================================
+// ENDPOINT DASHBOARD UTAMA
+// ============================================================================
+app.get('/api/admin/dashboard-stats', verifyToken, async (req, res) => {
+    try {
+        // Mengambil semua status dari tabel PPDB untuk dihitung
+        const { data: ppdbData, error: ppdbError } = await supabase
+            .from('ppdb')
+            .select('status');
+
+        if (ppdbError) throw ppdbError;
+
+        // Menghitung statistik
+        const totalPPDB = ppdbData.length;
+        const pendingPPDB = ppdbData.filter(item => item.status === 'Pending').length;
+        const diterimaPPDB = ppdbData.filter(item => item.status === 'Diterima').length;
+        const ditolakPPDB = ppdbData.filter(item => item.status === 'Ditolak').length;
+
+        // Kirim data ke frontend
+        res.json({
+            success: true,
+            data: {
+                ppdb: {
+                    total: totalPPDB,
+                    pending: pendingPPDB,
+                    diterima: diterimaPPDB,
+                    ditolak: ditolakPPDB
+                }
+            }
+        });
+    } catch (err) {
+        console.error("Error Get Stats:", err);
+        res.status(500).json({ success: false, pesan: 'Gagal mengambil data statistik dashboard.' });
+    }
+});
+
+// ============================================================================
+// ENDPOINT PENGATURAN WEB (DIUPGRADE DENGAN FOTO & PROFIL LENGKAP)
+// ============================================================================
+
+app.get('/api/settings', async (req, res) => {
+    try {
+        const { data, error } = await supabase.from('web_settings').select('*').eq('id', 1).single();
+        if (error) throw error;
+        res.json({ success: true, data: data });
+    } catch (err) {
+        res.status(500).json({ success: false, pesan: 'Gagal mengambil pengaturan web.' });
+    }
+});
+
+// Menggunakan multer (upload.fields) agar bisa menerima file gambar
+app.put('/api/admin/settings', verifyToken, upload.fields([
+    { name: 'foto_kepsek_sd', maxCount: 1 },
+    { name: 'foto_kepsek_paud', maxCount: 1 }
+]), async (req, res) => {
+    try {
+        const body = req.body;
+        
+        let updateData = {
+            nama_yayasan: body.nama_yayasan, npsn: body.npsn,
+            telepon_resmi: body.telepon_resmi, email_resmi: body.email_resmi,
+            alamat_lengkap: body.alamat_lengkap, google_maps: body.google_maps,
+            facebook: body.facebook, instagram: body.instagram, youtube: body.youtube,
+            nama_kepsek_sd: body.nama_kepsek_sd, sambutan_kepsek_sd: body.sambutan_kepsek_sd,
+            nama_kepsek_paud: body.nama_kepsek_paud, sambutan_kepsek_paud: body.sambutan_kepsek_paud,
+            sejarah_singkat: body.sejarah_singkat, visi: body.visi, misi: body.misi,
+            is_ppdb_open: body.is_ppdb_open === 'true', teks_pengumuman: body.teks_pengumuman,
+            tahun_ajaran: body.tahun_ajaran, updated_at: new Date()
+        };
+
+        // Jika ada file foto yang diunggah, proses ke Supabase Storage
+        if (req.files) {
+            if (req.files['foto_kepsek_sd']) {
+                updateData.foto_kepsek_sd = await uploadToSupabaseStorage(req.files['foto_kepsek_sd'][0], 'profil', 'kepsek_sd');
+            }
+            if (req.files['foto_kepsek_paud']) {
+                updateData.foto_kepsek_paud = await uploadToSupabaseStorage(req.files['foto_kepsek_paud'][0], 'profil', 'kepsek_paud');
+            }
+        }
+
+        const { data, error } = await supabase.from('web_settings').update(updateData).eq('id', 1).select();
+        if (error) throw error;
+        
+        res.json({ success: true, pesan: 'Pengaturan sistem berhasil diperbarui!', data: data[0] });
+    } catch (err) {
+        console.error("Error Update Settings:", err);
+        res.status(500).json({ success: false, pesan: 'Gagal menyimpan pengaturan web.' });
+    }
+});
+
+// ============================================================================
+// ENDPOINT BANNER & PENGUMUMAN DIGITAL
+// ============================================================================
+
+// 1. [PUBLIK] Mengambil Banner yang Sedang Aktif Sesuai Waktu (Auto-Timer)
+app.get('/api/banners', async (req, res) => {
+    try {
+        const now = new Date().toISOString();
+        
+        const { data, error } = await supabase
+            .from('banners')
+            .select('*')
+            .eq('is_active', true)
+            .lte('waktu_mulai', now)      // Waktu mulai sudah terlewati (sudah masuk jadwal)
+            .gte('waktu_selesai', now)    // Waktu selesai belum terlewati (belum kedaluwarsa)
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+        res.json({ success: true, data: data });
+    } catch (err) {
+        console.error("Error Get Banners:", err);
+        res.status(500).json({ success: false, pesan: 'Gagal memuat banner.' });
+    }
+});
+
+// 2. [ADMIN] Mengambil Semua Banner (Termasuk yang sudah kedaluwarsa)
+app.get('/api/admin/banners', verifyToken, async (req, res) => {
+    try {
+        const { data, error } = await supabase.from('banners').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        res.json({ success: true, data: data });
+    } catch (err) {
+        res.status(500).json({ success: false, pesan: 'Gagal mengambil data banner.' });
+    }
+});
+
+// 3. [ADMIN] Upload & Simpan Banner Baru
+app.post('/api/admin/banners', verifyToken, upload.single('gambar_banner'), async (req, res) => {
+    try {
+        const { judul, posisi, link_url, waktu_mulai, waktu_selesai } = req.body;
+        const fileGambar = req.file;
+
+        if (!fileGambar) {
+            return res.status(400).json({ success: false, pesan: "Gambar banner wajib diunggah." });
+        }
+
+        // Upload ke Supabase Storage (Buat bucket 'banner-web' di Supabase Anda)
+        const gambarUrl = await uploadToSupabaseStorage(fileGambar, 'pengumuman', `banner_${Date.now()}`);
+
+        const { data, error } = await supabase
+            .from('banners')
+            .insert([{
+                judul, 
+                posisi, 
+                link_url: link_url || '#', 
+                waktu_mulai, 
+                waktu_selesai, 
+                gambar_url: gambarUrl
+            }]);
+
+        if (error) throw error;
+        res.status(201).json({ success: true, pesan: 'Banner berhasil dijadwalkan!' });
+    } catch (err) {
+        console.error("Error Upload Banner:", err);
+        res.status(500).json({ success: false, pesan: 'Gagal menyimpan banner: ' + err.message });
+    }
+});
+
+// 4. [ADMIN] Hapus Banner
+app.delete('/api/admin/banners/:id', verifyToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { error } = await supabase.from('banners').delete().eq('id', id);
+        if (error) throw error;
+        res.json({ success: true, pesan: 'Banner berhasil dihapus.' });
+    } catch (err) {
+        res.status(500).json({ success: false, pesan: 'Gagal menghapus banner.' });
+    }
+});
+
+// ============================================================================
+// ENDPOINT BERITA & INFORMASI (BLOG SYSTEM)
+// ============================================================================
+
+// 1. [PUBLIK] Mengambil Berita (HANYA YANG STATUSNYA 'Publish')
+app.get('/api/berita', async (req, res) => {
+    try {
+        const { kategori } = req.query;
+        let query = supabase.from('berita')
+            .select('id, judul, slug, kategori, foto_cover, penulis, created_at, konten')
+            .eq('status', 'Publish') // <-- Filter wajib Publish
+            .order('created_at', { ascending: false });
+        
+        if (kategori) query = query.eq('kategori', kategori);
+
+        const { data, error } = await query;
+        if (error) throw error;
+        res.json({ success: true, data: data });
+    } catch (err) {
+        res.status(500).json({ success: false, pesan: 'Gagal memuat berita.' });
+    }
+});
+
+// 2. [PUBLIK] Mengambil Detail Berita (Hanya jika Publish)
+app.get('/api/berita/:slug', async (req, res) => {
+    try {
+        const { slug } = req.params;
+        const { data, error } = await supabase.from('berita').select('*').eq('slug', slug).eq('status', 'Publish').single();
+        
+        if (error || !data) return res.status(404).json({ success: false, pesan: 'Berita tidak ditemukan atau belum dipublish.' });
+        res.json({ success: true, data: data });
+    } catch (err) {
+        res.status(500).json({ success: false, pesan: 'Terjadi kesalahan pada server.' });
+    }
+});
+
+// 3. [ADMIN] Mengambil Semua Berita (Termasuk Pending)
+app.get('/api/admin/berita', verifyToken, async (req, res) => {
+    try {
+        const { data, error } = await supabase.from('berita').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        res.json({ success: true, data: data });
+    } catch (err) {
+        res.status(500).json({ success: false, pesan: 'Gagal mengambil data berita.' });
+    }
+});
+
+// 4. [ADMIN] Upload Berita Baru (Otomatis masuk 'Pending')
+app.post('/api/admin/berita', verifyToken, upload.single('foto_cover'), async (req, res) => {
+    try {
+        const { judul, kategori, konten, penulis } = req.body;
+        const fileGambar = req.file;
+
+        if (!fileGambar) return res.status(400).json({ success: false, pesan: "Foto cover wajib diunggah." });
+
+        const slug = judul.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') + '-' + Date.now().toString().slice(-4);
+        const fotoUrl = await uploadToSupabaseStorage(fileGambar, 'berita', `cover_${Date.now()}`);
+
+        const { error } = await supabase.from('berita').insert([{
+            judul, slug, kategori, konten, penulis, foto_cover: fotoUrl, status: 'Pending'
+        }]);
+
+        if (error) throw error;
+        res.status(201).json({ success: true, pesan: 'Draft Berita berhasil disimpan (Pending)!' });
+    } catch (err) {
+        res.status(500).json({ success: false, pesan: 'Gagal menyimpan berita: ' + err.message });
+    }
+});
+
+// 5. [ADMIN] Update Berita Penuh (Edit Form)
+app.put('/api/admin/berita/:id', verifyToken, upload.single('foto_cover'), async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { judul, kategori, konten } = req.body;
+        
+        let updateData = { judul, kategori, konten, updated_at: new Date() };
+
+        // Jika ada foto baru yang diunggah, perbarui link gambarnya
+        if (req.file) {
+            updateData.foto_cover = await uploadToSupabaseStorage(req.file, 'berita', `cover_${Date.now()}`);
+        }
+
+        const { error } = await supabase.from('berita').update(updateData).eq('id', id);
+        if (error) throw error;
+        res.json({ success: true, pesan: 'Berita berhasil diperbarui!' });
+    } catch (err) {
+        res.status(500).json({ success: false, pesan: 'Gagal mengupdate berita.' });
+    }
+});
+
+// 6. [ADMIN] Ubah Status Berita (Publish / Pending)
+app.put('/api/admin/berita/:id/status', verifyToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+        const { error } = await supabase.from('berita').update({ status }).eq('id', id);
+        if (error) throw error;
+        res.json({ success: true, pesan: `Status berita berhasil diubah menjadi ${status}!` });
+    } catch (err) {
+        res.status(500).json({ success: false, pesan: 'Gagal mengubah status.' });
+    }
+});
+
+// 7. [ADMIN] Hapus Berita
+app.delete('/api/admin/berita/:id', verifyToken, async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { error } = await supabase.from('berita').delete().eq('id', id);
+        if (error) throw error;
+        res.json({ success: true, pesan: 'Berita berhasil dihapus.' });
+    } catch (err) {
+        res.status(500).json({ success: false, pesan: 'Gagal menghapus berita.' });
+    }
+});
 
 // ============================================================================
 // FALLBACK ROUTE / 404 HANDLER -> POSISI WAJIB PALING BAWAH

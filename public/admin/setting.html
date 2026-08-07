@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengaturan Web - CMS Yayasan Al-Hidayah</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f1f5f9; display: flex; overflow-x: hidden; }
+        #sidebar-container { position: fixed; top: 0; left: 0; z-index: 40; transition: transform 0.3s; }
+        #main-content { margin-left: 260px; padding: 40px; width: calc(100% - 260px); box-sizing: border-box; min-height: 100vh; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .header h1 { margin: 0; font-size: 1.8rem; color: #0f172a; }
+        
+        .btn-edit { background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .btn-cancel { background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+
+        /* Tabs Navigation */
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; overflow-x: auto; }
+        .tab-btn { padding: 12px 20px; background: none; border: none; font-weight: 600; color: #64748b; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; font-size: 0.95rem; white-space: nowrap; }
+        .tab-btn.active { color: #10b981; border-bottom-color: #10b981; }
+        .tab-content { display: none; background: white; padding: 30px; border-radius: 0 0 16px 16px; border: 1px solid #e2e8f0; border-top: none; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); }
+        .tab-content.active { display: block; }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 700; color: #64748b; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;}
+        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-family: inherit; font-size: 0.95rem; box-sizing: border-box; transition: 0.3s; }
+        .form-group textarea { resize: vertical; min-height: 100px; }
+        
+        /* MAGIC VIEW MODE: Jika Fieldset di-disable, input terlihat seperti teks biasa */
+        fieldset:disabled input, fieldset:disabled textarea, fieldset:disabled select { 
+            background: transparent; border-color: transparent; color: #0f172a; font-weight: 600; padding: 0; appearance: none; -webkit-appearance: none; cursor: default;
+        }
+        fieldset:disabled .upload-area { display: none; } /* Sembunyikan tombol upload di mode View */
+
+        .btn-save { background: #10b981; color: white; border: none; padding: 14px 24px; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; width: 100%; justify-content: center; margin-top: 20px; display: none; }
+        .fab-menu { display: none; position: fixed; bottom: 24px; left: 24px; width: 56px; height: 56px; background: #0f172a; color: white; border-radius: 50%; border: none; z-index: 50; cursor: pointer; align-items: center; justify-content: center; font-size: 1.5rem; }
+
+        @media (max-width: 768px) {
+            #main-content { margin-left: 0; width: 100%; padding: 20px; padding-bottom: 100px; }
+            .header { flex-direction: column; align-items: flex-start; gap: 15px; }
+            #sidebar-container { transform: translateX(-100%); }
+            #sidebar-container.show-sidebar { transform: translateX(0); }
+            .fab-menu { display: flex; }
+            .form-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar-container"></div>
+    <button class="fab-menu" id="btnToggleMenu"><i class="ph ph-list"></i></button>
+
+    <main id="main-content">
+        <div class="header">
+            <div>
+                <h1>Pengaturan Web Lengkap</h1>
+                <p style="color: #64748b; margin-top: 5px; font-size: 0.95rem;">Kelola identitas, profil, dan sambutan Yayasan Al-Hidayah.</p>
+            </div>
+            <button id="btnToggleMode" class="btn-edit" onclick="toggleEditMode()">
+                <i class="ph-bold ph-pencil-simple"></i> Edit Data
+            </button>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="openTab('tab-identitas')"><i class="ph ph-buildings"></i> Identitas & Kontak</button>
+            <button class="tab-btn" onclick="openTab('tab-profil')"><i class="ph ph-book-open"></i> Profil & Sambutan</button>
+            <button class="tab-btn" onclick="openTab('tab-ppdb')"><i class="ph ph-student"></i> Konfigurasi Sistem</button>
+        </div>
+
+        <form id="formSettings">
+            <!-- FIELDSET: Jika disable = mode Tampilan Paten. Jika enable = mode form input -->
+            <fieldset id="formFieldset" disabled style="border:none; padding:0; margin:0;">
+                
+                <!-- TAB 1: IDENTITAS -->
+                <div id="tab-identitas" class="tab-content active">
+                    <div class="form-grid">
+                        <div class="form-group"><label>Nama Yayasan/Sekolah</label><input type="text" id="nama_yayasan"></div>
+                        <div class="form-group"><label>NPSN</label><input type="text" id="npsn"></div>
+                        <div class="form-group"><label>WhatsApp Resmi</label><input type="text" id="telepon_resmi"></div>
+                        <div class="form-group"><label>Email Resmi</label><input type="email" id="email_resmi"></div>
+                    </div>
+                    <div class="form-group"><label>Alamat Lengkap</label><textarea id="alamat_lengkap"></textarea></div>
+                    <div class="form-group"><label>Link Google Maps (URL)</label><input type="text" id="google_maps"></div>
+                    
+                    <h3 style="font-size: 1rem; color: #0f172a; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; margin-top: 30px;">Media Sosial</h3>
+                    <div class="form-grid">
+                        <div class="form-group"><label>Instagram (URL)</label><input type="text" id="instagram"></div>
+                        <div class="form-group"><label>Facebook (URL)</label><input type="text" id="facebook"></div>
+                        <div class="form-group"><label>YouTube (URL)</label><input type="text" id="youtube"></div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: PROFIL & SAMBUTAN -->
+                <div id="tab-profil" class="tab-content">
+                    <div class="form-group"><label>Sejarah Singkat</label><textarea id="sejarah_singkat"></textarea></div>
+                    <div class="form-grid">
+                        <div class="form-group"><label>Visi Sekolah</label><textarea id="visi"></textarea></div>
+                        <div class="form-group"><label>Misi Sekolah</label><textarea id="misi"></textarea></div>
+                    </div>
+
+                    <h3 style="font-size: 1rem; color: #0f172a; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; margin-top: 30px;">Sambutan Kepala Sekolah SDIT</h3>
+                    <div class="form-grid">
+                        <div class="form-group"><label>Nama Kepala SDIT</label><input type="text" id="nama_kepsek_sd"></div>
+                        <div class="form-group">
+                            <label>Foto Kepala SDIT Saat Ini</label>
+                            <img id="preview_kepsek_sd" src="" alt="Belum ada foto" style="width: 120px; height: 120px; object-fit: cover; border-radius: 12px; margin-bottom: 10px; border: 2px solid #e2e8f0; background: #f8fafc; font-size: 0.8rem; color: #94a3b8; display: flex; align-items: center; justify-content: center;">
+                            <div class="upload-area">
+                                <label style="font-size: 0.75rem; color: #3b82f6;">Ganti Foto Baru (Opsional)</label>
+                                <input type="file" id="foto_kepsek_sd" accept="image/*" style="padding: 8px;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group"><label>Teks Sambutan SDIT</label><textarea id="sambutan_kepsek_sd"></textarea></div>
+
+                    <h3 style="font-size: 1rem; color: #0f172a; border-bottom: 1px solid #e2e8f0; padding-bottom: 10px; margin-top: 30px;">Sambutan Kepala PAUD/TK IT</h3>
+                    <div class="form-grid">
+                        <div class="form-group"><label>Nama Kepala PAUD</label><input type="text" id="nama_kepsek_paud"></div>
+                        <div class="form-group">
+                            <label>Foto Kepala PAUD Saat Ini</label>
+                            <img id="preview_kepsek_paud" src="" alt="Belum ada foto" style="width: 120px; height: 120px; object-fit: cover; border-radius: 12px; margin-bottom: 10px; border: 2px solid #e2e8f0; background: #f8fafc; font-size: 0.8rem; color: #94a3b8; display: flex; align-items: center; justify-content: center;">
+                            <div class="upload-area">
+                                <label style="font-size: 0.75rem; color: #3b82f6;">Ganti Foto Baru (Opsional)</label>
+                                <input type="file" id="foto_kepsek_paud" accept="image/*" style="padding: 8px;">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group"><label>Teks Sambutan PAUD</label><textarea id="sambutan_kepsek_paud"></textarea></div>
+                </div>
+
+                <!-- TAB 3: KONFIGURASI SISTEM -->
+                <div id="tab-ppdb" class="tab-content">
+                    <div class="form-grid">
+                        <div class="form-group"><label>Tahun Ajaran Aktif</label><input type="text" id="tahun_ajaran"></div>
+                        <div class="form-group">
+                            <label>Status Formulir PPDB</label>
+                            <select id="is_ppdb_open">
+                                <option value="true">DIBUKA (Menerima Pendaftar)</option>
+                                <option value="false">DITUTUP (Tolak Pendaftar Baru)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group"><label>Teks Pengumuman PPDB</label><textarea id="teks_pengumuman"></textarea></div>
+                </div>
+
+            </fieldset>
+
+            <button type="submit" id="btnSaveSubmit" class="btn-save">
+                <i class="ph-bold ph-floppy-disk"></i> Simpan Semua Perubahan
+            </button>
+        </form>
+    </main>
+
+    <script>
+        const token = localStorage.getItem('cms_token');
+        if (!token) window.location.href = '/admin/login.html';
+
+        fetch('/admin/components/sidebar.html')
+            .then(res => res.text())
+            .then(data => { if (!data.includes('<html')) document.getElementById('sidebar-container').innerHTML = data; });
+
+        document.getElementById('btnToggleMenu').addEventListener('click', () => {
+            document.getElementById('sidebar-container').classList.toggle('show-sidebar');
+        });
+
+        // Logika Tab
+        function openTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        // Logika View/Edit Mode Cerdas
+        let isEditMode = false;
+        function toggleEditMode() {
+            isEditMode = !isEditMode;
+            const fieldset = document.getElementById('formFieldset');
+            const btnMode = document.getElementById('btnToggleMode');
+            const btnSave = document.getElementById('btnSaveSubmit');
+
+            if (isEditMode) {
+                fieldset.disabled = false; // Aktifkan input
+                btnSave.style.display = 'flex'; // Munculkan tombol simpan
+                btnMode.className = 'btn-cancel';
+                btnMode.innerHTML = '<i class="ph-bold ph-x"></i> Batal Edit';
+            } else {
+                fieldset.disabled = true; // Kunci input (jadi tampilan paten)
+                btnSave.style.display = 'none'; // Sembunyikan tombol simpan
+                btnMode.className = 'btn-edit';
+                btnMode.innerHTML = '<i class="ph-bold ph-pencil-simple"></i> Edit Data';
+                loadSettings(); // Kembalikan ke data asli jika dibatalkan
+            }
+        }
+
+        // Tarik Data
+        async function loadSettings() {
+            try {
+                const res = await fetch('/api/settings');
+                const result = await res.json();
+                
+                if (result.success && result.data) {
+                    const d = result.data;
+                    document.getElementById('nama_yayasan').value = d.nama_yayasan || '-';
+                    document.getElementById('npsn').value = d.npsn || '-';
+                    document.getElementById('telepon_resmi').value = d.telepon_resmi || '-';
+                    document.getElementById('email_resmi').value = d.email_resmi || '-';
+                    document.getElementById('alamat_lengkap').value = d.alamat_lengkap || '-';
+                    document.getElementById('google_maps').value = d.google_maps || '-';
+                    document.getElementById('instagram').value = d.instagram || '-';
+                    document.getElementById('facebook').value = d.facebook || '-';
+                    document.getElementById('youtube').value = d.youtube || '-';
+                    
+                    document.getElementById('sejarah_singkat').value = d.sejarah_singkat || '-';
+                    document.getElementById('visi').value = d.visi || '-';
+                    document.getElementById('misi').value = d.misi || '-';
+                    
+                    document.getElementById('nama_kepsek_sd').value = d.nama_kepsek_sd || '-';
+                    document.getElementById('sambutan_kepsek_sd').value = d.sambutan_kepsek_sd || '-';
+                    document.getElementById('nama_kepsek_paud').value = d.nama_kepsek_paud || '-';
+                    document.getElementById('sambutan_kepsek_paud').value = d.sambutan_kepsek_paud || '-';
+
+                    document.getElementById('tahun_ajaran').value = d.tahun_ajaran || '-';
+                    document.getElementById('is_ppdb_open').value = d.is_ppdb_open ? 'true' : 'false';
+                    document.getElementById('teks_pengumuman').value = d.teks_pengumuman || '-';
+
+                    // Menampilkan Preview Foto Kepala Sekolah
+                    if (d.foto_kepsek_sd) document.getElementById('preview_kepsek_sd').src = d.foto_kepsek_sd;
+                    if (d.foto_kepsek_paud) document.getElementById('preview_kepsek_paud').src = d.foto_kepsek_paud;
+                }
+            } catch (err) { console.error("Gagal memuat:", err); }
+        }
+
+        // Simpan Data Menggunakan FormData (Karena ada File Upload)
+        document.getElementById('formSettings').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btnSave = document.getElementById('btnSaveSubmit');
+            const originalText = btnSave.innerHTML;
+            btnSave.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Menyimpan...';
+            btnSave.disabled = true;
+
+            const formData = new FormData();
+            
+            // Masukkan semua data teks
+            const textFields = ['nama_yayasan', 'npsn', 'telepon_resmi', 'email_resmi', 'alamat_lengkap', 'google_maps', 'instagram', 'facebook', 'youtube', 'sejarah_singkat', 'visi', 'misi', 'nama_kepsek_sd', 'sambutan_kepsek_sd', 'nama_kepsek_paud', 'sambutan_kepsek_paud', 'tahun_ajaran', 'is_ppdb_open', 'teks_pengumuman'];
+            textFields.forEach(field => {
+                formData.append(field, document.getElementById(field).value);
+            });
+
+            // Masukkan data file (jika ada)
+            const fileSd = document.getElementById('foto_kepsek_sd').files[0];
+            if (fileSd) formData.append('foto_kepsek_sd', fileSd);
+            
+            const filePaud = document.getElementById('foto_kepsek_paud').files[0];
+            if (filePaud) formData.append('foto_kepsek_paud', filePaud);
+
+            try {
+                const res = await fetch('/api/admin/settings', {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${token}` }, // Form Data tidak butuh Content-Type, biarkan browser yang urus boundary-nya
+                    body: formData
+                });
+                const result = await res.json();
+
+                if (result.success) {
+                    alert('Sukses! Seluruh profil yayasan diperbarui.');
+                    await loadSettings();
+                    toggleEditMode(); // Kunci kembali ke mode Paten
+                } else {
+                    alert('Gagal: ' + result.pesan);
+                }
+            } catch (err) {
+                alert('Terjadi kesalahan saat mengunggah data.');
+            } finally {
+                btnSave.innerHTML = originalText;
+                btnSave.disabled = false;
+            }
+        });
+
+        loadSettings();
+    </script>
+</body>
+</html>

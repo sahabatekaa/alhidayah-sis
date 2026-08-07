@@ -20,11 +20,13 @@
         <section class="hero-modern">
             <div class="hero-container">
                 <div class="hero-text">
-                    <span class="hero-badge">Selamat Datang di Yayasan Al-Hidayah Amansari</span>
+                    <!-- Class set-nama-yayasan disuntikkan ke sini -->
+                    <span class="hero-badge">Selamat Datang di <span class="set-nama-yayasan">Yayasan Al-Hidayah Amansari</span></span>
                     <h1>Membangun Generasi Rabbani yang Cerdas & Berakhlak</h1>
                     <p>Lembaga pendidikan Islam terpadu yang berdedikasi mencetak generasi Qur'ani, berwawasan luas, dan siap menyongsong masa depan di tingkat PAUD/TK IT dan SDIT.</p>
                     <div class="hero-buttons">
                         <a href="/ppdb.html" class="btn-primary">Daftar Sekarang</a>
+                        <!-- Jika Anda ingin tombol WA ini dinamis, bisa tambahkan class khusus di JS nanti -->
                         <a href="https://wa.me/6281234567890" class="btn-outline-white">Hubungi Kami</a>
                     </div>
                 </div>
@@ -144,5 +146,7 @@
 
     <!-- Menghubungkan JavaScript -->
     <script src="/js/main.js"></script>
+    <!-- SCRIPT PENARIK DATA CMS (Diletakkan paling bawah) -->
+    <script src="/js/global-settings.js"></script>
 </body>
 </html>

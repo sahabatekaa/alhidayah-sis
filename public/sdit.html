@@ -17,7 +17,7 @@
             <div class="header-content">
                 <span class="badge">Sekolah Dasar Islam Terpadu</span>
                 <h1>SD IT Al-Hidayah</h1>
-                <p>Generasi Cerdas, Beradab, dan Qur'aniMemadukan Akademik & Akhlakul Karimah di Amansari.</p>
+                <p>Generasi Cerdas, Beradab, dan Qur'ani Memadukan Akademik & Akhlakul Karimah di Amansari.</p>
             </div>
         </section>
 
@@ -27,13 +27,15 @@
                 
                 <!-- Kolom Kiri: Deskripsi & Program -->
                 <div class="unit-text">
-                    <span class="badge gold">NPSN: 70037035</span>
+                    <span class="badge gold">NPSN: <span class="set-npsn">70037035</span></span>
                     <h2 class="unit-title">Sekolah Dasar Unggulan Serbelawan Simalungun</h2>
                     <p class="unit-desc">Kami memadukan keunggulan akademik Kurikulum Merdeka dengan pendidikan adab, Tahfidz, dan Teknologi.</p>
                     
                     <div class="quote-box gold-border">
-                        <p><em>"Assalamu’alaikum Warahmatullahi Wabarakatuh. Puji syukur ke hadirat Allah SWT, kami menyambut Anda wali murid di portal informasi SD IT Al Hidayah Amansari Simalungun. Tantangan zaman saat ini menuntut anak-anak kita tidak hanya cerdas secara intelektual, tetapi juga kuat secara spiritual dan moral. Di SD IT Al Hidayah, kami memadukan Kurikulum Merdeka dengan kurikulum keagamaan Islam Terpadu untuk memastikan setiap siswa mendapatkan keseimbangan pendidikan dunia dan akhirat. Mari sinergi, mempersiapkan calon pemimpin masa depan yang berprestasi dan hafal Al-Qur'an."</em></p>
-                        <span class="quote-author">— [Nama Kepala SDIT], Kepala SD IT Al-Hidayah Amansari</span>
+                        <!-- Class set-sambutan-kepsek-sd disuntikkan ke sini -->
+                        <p class="set-sambutan-kepsek-sd" style="white-space: pre-line; font-style: italic;">"Assalamu’alaikum Warahmatullahi Wabarakatuh. Puji syukur ke hadirat Allah SWT, kami menyambut Anda wali murid di portal informasi SD IT Al Hidayah Amansari Simalungun. Tantangan zaman saat ini menuntut anak-anak kita tidak hanya cerdas secara intelektual, tetapi juga kuat secara spiritual dan moral. Di SD IT Al Hidayah, kami memadukan Kurikulum Merdeka dengan kurikulum keagamaan Islam Terpadu untuk memastikan setiap siswa mendapatkan keseimbangan pendidikan dunia dan akhirat. Mari sinergi, mempersiapkan calon pemimpin masa depan yang berprestasi dan hafal Al-Qur'an."</p>
+                        <!-- Class set-nama-kepsek-sd disuntikkan ke sini -->
+                        <span class="quote-author">— <span class="set-nama-kepsek-sd">[Nama Kepala SDIT]</span>, Kepala SD IT Al-Hidayah Amansari</span>
                     </div>
 
                     <div class="features-list">
@@ -139,7 +141,7 @@
 
     <script src="/js/main.js"></script>
     <script>
-        // Vanilla JS khusus untuk Carousel SD IT (Sama seperti PAUD, ganti ID)
+        // Vanilla JS khusus untuk Carousel SD IT
         document.addEventListener('DOMContentLoaded', function() {
             const track = document.querySelector('#sdit-carousel .carousel-track');
             const items = document.querySelectorAll('#sdit-carousel .carousel-item');
@@ -193,5 +195,8 @@
             setInterval(() => { updateCarousel(index + getItemsPerSlide()); }, 5000);
         });
     </script>
+    
+    <!-- SCRIPT PENARIK DATA CMS (Wajib di bawah) -->
+    <script src="/js/global-settings.js"></script>
 </body>
 </html>

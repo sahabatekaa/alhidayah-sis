@@ -15,7 +15,7 @@
         <!-- 1. HEADER BANNER -->
         <section class="page-header">
             <div class="header-content">
-                <h1>Profil Yayasan Al-Hidayah Amansari</h1>
+                <h1 class="set-nama-yayasan">Profil Yayasan Al-Hidayah Amansari</h1>
                 <p>Mengenal Lebih Dekat Rumah Pendidikan Karakter & Akademik Putra-Putri Anda di Serbelawan.</p>
             </div>
         </section>
@@ -25,12 +25,14 @@
             <div class="story-grid">
                 <div class="story-text">
                     <h2 class="section-title" style="text-align: left; margin-bottom: 1rem;">Mendidik dengan Hati, Membangun Generasi Qur'ani</h2>
-                    <p>Yayasan Al-Hidayah Amansari didirikan atas dasar kepedulian dan dorongan masyarakat di Nagori Amansari, Kecamatan Dolok Batu Nanggar (Serbelawan), Kabupaten Simalungun. Kami melihat betapa krusialnya penanaman benteng tauhid dan akhlakul karimah pada anak-anak sejak usia dini.</p>
-                    <p>Berawal dari niat tulus untuk menghadirkan pendidikan Islam terpadu yang berkualitas namun tetap terjangkau, Yayasan Al-Hidayah Amansari kini menaungi dua jenjang pendidikan utama: <strong>PAUD Al-Hidayah</strong> dan <strong>SDIT Al-Hidayah</strong>.</p>
-                    <p>Melalui dua unit ini, kami berkomitmen mendampingi fase emas <em>(golden age)</em> dan fase pendidikan dasar anak agar tumbuh menjadi pribadi yang cerdas, santun, dan taat beragama.</p>
+                    <!-- Class set-sejarah disuntikkan di sini. Pre-line agar enter/baris baru dari CMS terbaca -->
+                    <div class="set-sejarah" style="white-space: pre-line; color: var(--text-color); line-height: 1.6;">
+                        <p>Yayasan Al-Hidayah Amansari didirikan atas dasar kepedulian dan dorongan masyarakat di Nagori Amansari, Kecamatan Dolok Batu Nanggar (Serbelawan), Kabupaten Simalungun. Kami melihat betapa krusialnya penanaman benteng tauhid dan akhlakul karimah pada anak-anak sejak usia dini.</p>
+                        <p>Berawal dari niat tulus untuk menghadirkan pendidikan Islam terpadu yang berkualitas namun tetap terjangkau, Yayasan Al-Hidayah Amansari kini menaungi dua jenjang pendidikan utama: <strong>PAUD Al-Hidayah</strong> dan <strong>SDIT Al-Hidayah</strong>.</p>
+                        <p>Melalui dua unit ini, kami berkomitmen mendampingi fase emas <em>(golden age)</em> dan fase pendidikan dasar anak agar tumbuh menjadi pribadi yang cerdas, santun, dan taat beragama.</p>
+                    </div>
                 </div>
                 <div class="story-image">
-                    <!-- Placeholder Foto Gedung -->
                     <img src="https://picsum.photos/600/400?random=15" alt="Gedung Yayasan Al-Hidayah" class="rounded-img shadow">
                 </div>
             </div>
@@ -44,18 +46,42 @@
                 <div class="vm-card">
                     <div class="vm-icon">🎯</div>
                     <h3>Visi Kami</h3>
-                    <p>Menjadi lembaga pendidikan dasar dan usia dini Islami pilihan utama di Serbelawan yang mencetak murid cerdas, santun, bertauhid kokoh, dan siap menghadapi jenjang pendidikan berikutnya.</p>
+                    <p class="set-visi" style="white-space: pre-line;">Menjadi lembaga pendidikan dasar dan usia dini Islami pilihan utama di Serbelawan yang mencetak murid cerdas, santun, bertauhid kokoh, dan siap menghadapi jenjang pendidikan berikutnya.</p>
                 </div>
                 <!-- Card Misi -->
                 <div class="vm-card">
                     <div class="vm-icon">🚀</div>
                     <h3>Misi Kami</h3>
-                    <ul class="styled-list">
-                        <li><strong>Integrasi Kurikulum:</strong> Menyelenggarakan pendidikan berkualitas dengan memadukan kurikulum nasional dan nilai-nilai Islam terpadu.</li>
-                        <li><strong>Pembentukan Adab:</strong> Membiasakan budaya adab, ibadah harian (sholat Dhuha/Dzuhur), dan hafalan Al-Qur'an (Juz 'Amma) sejak dini.</li>
-                        <li><strong>Lingkungan Ramah Anak:</strong> Menciptakan lingkungan belajar yang aman, bersih, asri, dan menyenangkan.</li>
-                        <li><strong>Sinergi Keluarga:</strong> Membangun kemitraan yang erat antara sekolah, orang tua, dan masyarakat sekitar.</li>
-                    </ul>
+                    <!-- Jika di CMS Misi diketik menggunakan angka/bullet biasa, pre-line akan merapikannya -->
+                    <div class="set-misi" style="white-space: pre-line;">
+                        <ul class="styled-list">
+                            <li><strong>Integrasi Kurikulum:</strong> Menyelenggarakan pendidikan berkualitas dengan memadukan kurikulum nasional dan nilai-nilai Islam terpadu.</li>
+                            <li><strong>Pembentukan Adab:</strong> Membiasakan budaya adab, ibadah harian (sholat Dhuha/Dzuhur), dan hafalan Al-Qur'an (Juz 'Amma) sejak dini.</li>
+                            <li><strong>Lingkungan Ramah Anak:</strong> Menciptakan lingkungan belajar yang aman, bersih, asri, dan menyenangkan.</li>
+                            <li><strong>Sinergi Keluarga:</strong> Membangun kemitraan yang erat antara sekolah, orang tua, dan masyarakat sekitar.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION BARU: SAMBUTAN KEPALA SEKOLAH (DARI CMS) -->
+        <section class="section-container">
+            <h2 class="section-title">Nakhoda Pendidikan Kami</h2>
+            <div class="vm-grid">
+                <!-- Sambutan PAUD -->
+                <div class="vm-card" style="text-align: center;">
+                    <img src="https://via.placeholder.com/150" alt="Foto Kepsek PAUD" class="set-foto-kepsek-paud" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary-light); margin-bottom: 1rem;">
+                    <h3 class="set-nama-kepsek-paud">Mislaini, S.Pd.</h3>
+                    <p style="color: var(--primary-color); font-weight: 600; margin-bottom: 1rem;">Kepala PAUD / TK IT</p>
+                    <p class="set-sambutan-kepsek-paud" style="font-style: italic; color: #475569; white-space: pre-line;">"Menyediakan lingkungan belajar yang ramah, islami, dan menyenangkan untuk fase emas anak-anak kita."</p>
+                </div>
+                <!-- Sambutan SDIT -->
+                <div class="vm-card" style="text-align: center;">
+                    <img src="https://via.placeholder.com/150" alt="Foto Kepsek SDIT" class="set-foto-kepsek-sd" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 4px solid var(--primary-light); margin-bottom: 1rem;">
+                    <h3 class="set-nama-kepsek-sd">[Nama Kepsek SDIT]</h3>
+                    <p style="color: var(--primary-color); font-weight: 600; margin-bottom: 1rem;">Kepala SDIT</p>
+                    <p class="set-sambutan-kepsek-sd" style="font-style: italic; color: #475569; white-space: pre-line;">"Membangun pondasi akademik yang solid terintegrasi dengan nilai-nilai Al-Qur'an demi masa depan yang gemilang."</p>
                 </div>
             </div>
         </section>
@@ -92,11 +118,11 @@
             <h2 class="section-title">Naungan Pendidikan Kami</h2>
             <div class="unit-list-grid">
                 <div class="unit-card-horizontal">
-                    <div class="unit-badge">PAUD / KB</div>
+                    <div class="unit-badge">PAUD / TK IT</div>
                     <div class="unit-info">
-                        <h3>PAUD Al-Hidayah Amansari</h3>
+                        <h3>PAUD / TK IT Al-Hidayah Amansari</h3>
                         <p><strong>Fokus:</strong> Stimulasi tumbuh kembang motorik, sosial-emosional, pengenalan huruf/angka, dan pembiasaan doa harian melalui metode belajar sambil bermain.</p>
-                        <span class="text-sm text-muted">NPSN: 69811663 | Kurikulum Merdeka</span>
+                        <span class="text-sm text-muted">NPSN: <span class="set-npsn">69811663</span> | Kurikulum Merdeka</span>
                     </div>
                 </div>
                 <div class="unit-card-horizontal">
@@ -104,7 +130,7 @@
                     <div class="unit-info">
                         <h3>SDIT Al-Hidayah Amansari</h3>
                         <p><strong>Fokus:</strong> Penanaman akademik dasar unggulan terintegrasi dengan bimbingan Tahfidz/Tahsin Al-Qur'an, pembiasaan sholat berjamaah, dan pengembangan minat bakat.</p>
-                        <span class="text-sm text-muted">NPSN: 70037035 | Kurikulum Merdeka</span>
+                        <span class="text-sm text-muted">NPSN: <span class="set-npsn">70037035</span> | Kurikulum Merdeka</span>
                     </div>
                 </div>
             </div>
@@ -121,12 +147,12 @@
                 </div>
                 <div class="team-card">
                     <div class="team-avatar">👤</div>
-                    <h4>Mislaini, S.Pd.</h4>
+                    <h4 class="set-nama-kepsek-paud">Mislaini, S.Pd.</h4>
                     <p>Pimpinan Yayasan / Kepala PAUD</p>
                 </div>
                 <div class="team-card">
                     <div class="team-avatar">👤</div>
-                    <h4>[Nama Kepsek SDIT]</h4>
+                    <h4 class="set-nama-kepsek-sd">[Nama Kepsek SDIT]</h4>
                     <p>Kepala SDIT Al-Hidayah</p>
                 </div>
                 <div class="team-card" style="background: var(--primary-color); color: white;">
@@ -147,7 +173,8 @@
                     <ul class="legal-details">
                         <li><strong>Badan Hukum / NPYP:</strong> Terdaftar Resmi (AY0557)</li>
                         <li><strong>SK Pendirian Operasional:</strong> 15 Agustus 2022 (Notaris)</li>
-                        <li><strong>Lokasi Operasional:</strong> Jl. Besar Aman Sari, Kec. Dolok Batu Nanggar (Serbelawan), Kab. Simalungun, Prov. Sumatera Utara (Kode Pos: 21155)</li>
+                        <!-- Alamat ditarik dari CMS -->
+                        <li><strong>Lokasi Operasional:</strong> <span class="set-alamat">Jl. Besar Aman Sari, Kec. Dolok Batu Nanggar (Serbelawan), Kab. Simalungun, Prov. Sumatera Utara (Kode Pos: 21155)</span></li>
                     </ul>
                 </div>
             </div>
@@ -158,6 +185,7 @@
             <h2>Ingin Mengenal Lingkungan Sekolah Kami Lebih Dekat?</h2>
             <p>Kami mengundang Bapak/Ibu untuk berkunjung langsung ke Yayasan Al-Hidayah Amansari atau berkonsultasi mengenai kebutuhan pendidikan putra-putrinya bersama tim kami.</p>
             <div class="cta-actions">
+                <!-- Jika nomor WA dibuat dinamis nantinya, kita bisa mainkan dari JS -->
                 <a href="https://wa.me/6281234567890" class="btn-primary">Hubungi Kami via WA</a>
                 <a href="/ppdb.html" class="btn-outline-white">Jadwalkan Kunjungan</a>
             </div>
@@ -169,5 +197,7 @@
     <div id="footer-placeholder"></div>
 
     <script src="/js/main.js"></script>
+    <!-- SCRIPT PENARIK DATA CMS (Wajib di bawah) -->
+    <script src="/js/global-settings.js"></script>
 </body>
 </html>

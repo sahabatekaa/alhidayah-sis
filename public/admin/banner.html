@@ -1,0 +1,277 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Banner - CMS Yayasan Al-Hidayah</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f1f5f9; display: flex; overflow-x: hidden; }
+        #sidebar-container { position: fixed; top: 0; left: 0; z-index: 40; transition: transform 0.3s; }
+        #main-content { margin-left: 260px; padding: 40px; width: calc(100% - 260px); box-sizing: border-box; min-height: 100vh; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .header h1 { margin: 0; font-size: 1.8rem; color: #0f172a; }
+        
+        .card { background: white; padding: 25px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); margin-bottom: 30px; }
+        .card-header { font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 10px; }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 700; color: #64748b; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;}
+        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-family: inherit; font-size: 0.95rem; box-sizing: border-box; transition: 0.3s; }
+        
+        .btn-submit { background: #3b82f6; color: white; border: none; padding: 14px 24px; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 10px; transition: 0.2s; }
+        .btn-submit:hover { background: #2563eb; }
+
+        /* Table Styles */
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 800px; }
+        th { text-align: left; padding: 15px; background: #f8fafc; color: #64748b; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 15px; border-bottom: 1px solid #e2e8f0; color: #334155; font-size: 0.95rem; vertical-align: middle; }
+        
+        .banner-thumb { width: 120px; height: 60px; object-fit: cover; border-radius: 6px; border: 1px solid #cbd5e1; background: #f1f5f9; }
+        
+        .badge { padding: 6px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 700; display: inline-block; }
+        .badge.active { background: #dcfce7; color: #166534; } /* Hijau */
+        .badge.scheduled { background: #fef08a; color: #854d0e; } /* Kuning */
+        .badge.expired { background: #fee2e2; color: #991b1b; } /* Merah */
+
+        .btn-delete { background: #ef4444; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 5px; font-weight: 600; font-size: 0.85rem; }
+        .btn-delete:hover { background: #dc2626; }
+
+        .fab-menu { display: none; position: fixed; bottom: 24px; left: 24px; width: 56px; height: 56px; background: #0f172a; color: white; border-radius: 50%; border: none; z-index: 50; cursor: pointer; align-items: center; justify-content: center; font-size: 1.5rem; }
+
+        @media (max-width: 768px) {
+            #main-content { margin-left: 0; width: 100%; padding: 20px; padding-bottom: 100px; }
+            #sidebar-container { transform: translateX(-100%); }
+            #sidebar-container.show-sidebar { transform: translateX(0); }
+            .fab-menu { display: flex; }
+            .form-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar-container"></div>
+    <button class="fab-menu" id="btnToggleMenu"><i class="ph ph-list"></i></button>
+
+    <main id="main-content">
+        <div class="header">
+            <div>
+                <h1>Kelola Banner & Pengumuman</h1>
+                <p style="color: #64748b; margin-top: 5px; font-size: 0.95rem;">Jadwalkan tayangan spanduk digital dan ucapan hari raya secara otomatis.</p>
+            </div>
+        </div>
+
+        <!-- FORM TAMBAH BANNER -->
+        <div class="card">
+            <div class="card-header"><i class="ph-bold ph-plus-circle" style="color: #3b82f6;"></i> Tambah Jadwal Banner Baru</div>
+            <form id="formBanner">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Judul / Nama Banner</label>
+                        <input type="text" id="judul" placeholder="Contoh: Ucapan Idul Fitri 1447 H" required>
+                    </div>
+                    <div class="form-group">
+                        <!-- BAGIAN YANG DIJAHIT: Opsi Posisi Tayang Baru -->
+                        <label>Posisi Tayang</label>
+                        <select id="posisi" required>
+                            <option value="slider_beranda">Slider Beranda (Bisa >1)</option>
+                            <option value="slider_sdit">Slider SD IT (Bisa >1)</option>
+                            <option value="slider_paud">Slider PAUD (Bisa >1)</option>
+                            <option value="popup">Pop-up Layar Depan (Hanya 1)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Waktu Mulai Tayang</label>
+                        <input type="datetime-local" id="waktu_mulai" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Waktu Selesai (Otomatis Hilang)</label>
+                        <input type="datetime-local" id="waktu_selesai" required>
+                    </div>
+                    <div class="form-group">
+                        <label>URL Tautan (Opsional jika diklik)</label>
+                        <input type="url" id="link_url" placeholder="https://...">
+                    </div>
+                    <div class="form-group">
+                        <label>Upload File Gambar (Rasio 16:9 disarankan)</label>
+                        <input type="file" id="gambar_banner" accept="image/*" required style="padding: 9px;">
+                    </div>
+                </div>
+                <button type="submit" id="btnSubmitBanner" class="btn-submit">
+                    <i class="ph-bold ph-upload-simple"></i> Unggah & Jadwalkan Banner
+                </button>
+            </form>
+        </div>
+
+        <!-- DAFTAR BANNER -->
+        <div class="card">
+            <div class="card-header"><i class="ph-bold ph-images" style="color: #10b981;"></i> Daftar Banner Tersimpan</div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Gambar</th>
+                            <th>Informasi Banner</th>
+                            <th>Posisi</th>
+                            <th>Status Tayang</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBodyBanners">
+                        <tr><td colspan="5" style="text-align: center; color: #64748b;">Memuat data banner...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        const token = localStorage.getItem('cms_token');
+        if (!token) window.location.href = '/admin/login.html';
+
+        // Load Sidebar
+        fetch('/admin/components/sidebar.html')
+            .then(res => res.text())
+            .then(data => { if (!data.includes('<html')) document.getElementById('sidebar-container').innerHTML = data; });
+
+        document.getElementById('btnToggleMenu').addEventListener('click', () => {
+            document.getElementById('sidebar-container').classList.toggle('show-sidebar');
+        });
+
+        // ==============================================================================
+        // FUNGSI LOAD DATA BANNER
+        // ==============================================================================
+        async function loadBanners() {
+            try {
+                const res = await fetch('/api/admin/banners', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await res.json();
+                const tbody = document.getElementById('tableBodyBanners');
+                tbody.innerHTML = '';
+
+                if (result.success && result.data.length > 0) {
+                    const now = new Date(); // Waktu saat ini untuk cek status
+
+                    result.data.forEach(banner => {
+                        const tMulai = new Date(banner.waktu_mulai);
+                        const tSelesai = new Date(banner.waktu_selesai);
+                        
+                        // Logika Status Tayang Otomatis
+                        let statusBadge = '';
+                        if (now < tMulai) {
+                            statusBadge = '<span class="badge scheduled">⏱️ Menunggu Jadwal</span>';
+                        } else if (now >= tMulai && now <= tSelesai) {
+                            statusBadge = '<span class="badge active">🟢 Sedang Tayang</span>';
+                        } else {
+                            statusBadge = '<span class="badge expired">🔴 Kedaluwarsa</span>';
+                        }
+
+                        // Format Posisi Text
+                        const posisiText = banner.posisi.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase());
+
+                        // Format Tanggal
+                        const formatTgl = (date) => date.toLocaleString('id-ID', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td><img src="${banner.gambar_url}" alt="Banner" class="banner-thumb"></td>
+                            <td>
+                                <strong style="color: #0f172a; display: block; margin-bottom: 5px;">${banner.judul}</strong>
+                                <span style="font-size: 0.8rem; color: #64748b;">Mulai: ${formatTgl(tMulai)}</span><br>
+                                <span style="font-size: 0.8rem; color: #64748b;">Sampai: ${formatTgl(tSelesai)}</span>
+                            </td>
+                            <td><strong>${posisiText}</strong></td>
+                            <td>${statusBadge}</td>
+                            <td>
+                                <button onclick="deleteBanner(${banner.id})" class="btn-delete">
+                                    <i class="ph-bold ph-trash"></i> Hapus
+                                </button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #64748b;">Belum ada banner yang dijadwalkan.</td></tr>';
+                }
+            } catch (err) {
+                console.error("Gagal memuat banner:", err);
+            }
+        }
+
+        // ==============================================================================
+        // FUNGSI TAMBAH BANNER BARU (MULTIPART FORM DATA)
+        // ==============================================================================
+        document.getElementById('formBanner').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btnSubmit = document.getElementById('btnSubmitBanner');
+            const originalText = btnSubmit.innerHTML;
+            btnSubmit.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Mengunggah...';
+            btnSubmit.disabled = true;
+
+            const formData = new FormData();
+            formData.append('judul', document.getElementById('judul').value);
+            formData.append('posisi', document.getElementById('posisi').value);
+            formData.append('waktu_mulai', document.getElementById('waktu_mulai').value);
+            formData.append('waktu_selesai', document.getElementById('waktu_selesai').value);
+            formData.append('link_url', document.getElementById('link_url').value);
+            formData.append('gambar_banner', document.getElementById('gambar_banner').files[0]);
+
+            try {
+                const res = await fetch('/api/admin/banners', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${token}` }, // Tanpa Content-Type agar browser set boundary otomatis
+                    body: formData
+                });
+                const result = await res.json();
+
+                if (result.success) {
+                    alert('Sukses! Banner berhasil dijadwalkan.');
+                    document.getElementById('formBanner').reset(); // Kosongkan form
+                    loadBanners(); // Reload tabel
+                } else {
+                    alert('Gagal: ' + result.pesan);
+                }
+            } catch (err) {
+                alert('Terjadi kesalahan saat mengunggah banner.');
+            } finally {
+                btnSubmit.innerHTML = originalText;
+                btnSubmit.disabled = false;
+            }
+        });
+
+        // ==============================================================================
+        // FUNGSI HAPUS BANNER
+        // ==============================================================================
+        async function deleteBanner(id) {
+            if (!confirm('Anda yakin ingin menghapus banner ini dari sistem?')) return;
+
+            try {
+                const res = await fetch(`/api/admin/banners/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const result = await res.json();
+
+                if (result.success) {
+                    loadBanners(); // Reload tabel
+                } else {
+                    alert('Gagal menghapus: ' + result.pesan);
+                }
+            } catch (err) {
+                alert('Terjadi kesalahan pada server.');
+            }
+        }
+
+        // Jalankan saat pertama kali buka halaman
+        loadBanners();
+    </script>
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memuat Berita... - Yayasan Al-Hidayah Amansari</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* Gaya Khusus Halaman Baca Artikel */
+        .article-container { max-width: 800px; margin: 40px auto; padding: 0 20px; }
+        .back-link { display: inline-flex; align-items: center; gap: 8px; color: var(--primary-color); text-decoration: none; font-weight: 600; margin-bottom: 20px; transition: 0.2s; }
+        .back-link:hover { color: #047857; transform: translateX(-5px); }
+        
+        .article-header { margin-bottom: 30px; text-align: center; }
+        .article-badge { background: #f59e0b; color: white; padding: 6px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; display: inline-block; margin-bottom: 15px; }
+        .article-title { font-size: 2.2rem; color: #0f172a; line-height: 1.3; margin-bottom: 20px; font-weight: 800; }
+        .article-meta { display: flex; justify-content: center; gap: 20px; color: #64748b; font-size: 0.95rem; flex-wrap: wrap; }
+        .article-meta span { display: flex; align-items: center; gap: 6px; }
+
+        .article-cover { width: 100%; max-height: 450px; object-fit: cover; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); margin-bottom: 40px; }
+        
+        /* Render HTML dari Quill.js */
+        .article-content { color: #334155; font-size: 1.1rem; line-height: 1.8; }
+        .article-content p { margin-bottom: 1.5rem; }
+        .article-content h2, .article-content h3 { color: #0f172a; margin-top: 2rem; margin-bottom: 1rem; }
+        .article-content img { max-width: 100%; height: auto; border-radius: 12px; margin: 20px 0; }
+        .article-content ul, .article-content ol { margin-bottom: 1.5rem; padding-left: 2rem; }
+        .article-content li { margin-bottom: 0.5rem; }
+        .article-content a { color: var(--primary-color); text-decoration: underline; }
+
+        /* Tombol Share */
+        .share-section { margin-top: 50px; padding-top: 30px; border-top: 1px solid #e2e8f0; text-align: center; }
+        .share-title { font-size: 1.1rem; color: #0f172a; font-weight: 700; margin-bottom: 15px; }
+        .share-buttons { display: flex; justify-content: center; gap: 15px; }
+        .btn-share { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 30px; color: white; text-decoration: none; font-weight: 600; font-size: 0.95rem; transition: 0.3s; }
+        .btn-share.wa { background: #25D366; }
+        .btn-share.wa:hover { background: #1ebe57; box-shadow: 0 4px 12px rgba(37, 211, 102, 0.4); }
+        .btn-share.fb { background: #1877F2; }
+        .btn-share.fb:hover { background: #166fe5; box-shadow: 0 4px 12px rgba(24, 119, 242, 0.4); }
+        .btn-share.copy { background: #64748b; }
+        .btn-share.copy:hover { background: #475569; }
+
+        /* Skeleton Loading */
+        .skeleton { background: #e2e8f0; border-radius: 8px; animation: pulse 1.5s infinite ease-in-out; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        @media (max-width: 768px) {
+            .article-title { font-size: 1.6rem; }
+            .article-cover { max-height: 250px; border-radius: 12px; }
+            .share-buttons { flex-direction: column; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Placeholder -->
+    <div id="header-placeholder"></div>
+
+    <main>
+        <section class="article-container" id="article-wrapper">
+            
+            <a href="/berita.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Kembali ke Pusat Informasi</a>
+
+            <!-- Loading State -->
+            <div id="loading-state" style="padding: 40px 0;">
+                <div class="skeleton" style="height: 30px; width: 150px; margin: 0 auto 20px;"></div>
+                <div class="skeleton" style="height: 50px; width: 90%; margin: 0 auto 20px;"></div>
+                <div class="skeleton" style="height: 400px; width: 100%; border-radius: 16px; margin-bottom: 40px;"></div>
+                <div class="skeleton" style="height: 20px; width: 100%; margin-bottom: 10px;"></div>
+                <div class="skeleton" style="height: 20px; width: 100%; margin-bottom: 10px;"></div>
+                <div class="skeleton" style="height: 20px; width: 80%;"></div>
+            </div>
+
+            <!-- Konten Artikel Asli (Disembunyikan saat loading) -->
+            <article id="article-content-ready" style="display: none;">
+                <div class="article-header">
+                    <span class="article-badge" id="view-kategori">Kategori</span>
+                    <h1 class="article-title" id="view-judul">Judul Berita</h1>
+                    <div class="article-meta">
+                        <span><i class="fa-regular fa-calendar"></i> <span id="view-tanggal">Tanggal</span></span>
+                        <span><i class="fa-regular fa-user"></i> <span id="view-penulis">Penulis</span></span>
+                    </div>
+                </div>
+
+                <img src="" alt="Cover Berita" id="view-cover" class="article-cover">
+
+                <div class="article-content" id="view-konten">
+                    <!-- Isi HTML dari Quill.js akan dirender di sini -->
+                </div>
+
+                <div class="share-section">
+                    <h3 class="share-title">Bagikan informasi ini:</h3>
+                    <div class="share-buttons">
+                        <a href="#" id="share-wa" target="_blank" class="btn-share wa">
+                            <i class="fa-brands fa-whatsapp fa-lg"></i> WhatsApp
+                        </a>
+                        <a href="#" id="share-fb" target="_blank" class="btn-share fb">
+                            <i class="fa-brands fa-facebook-f fa-lg"></i> Facebook
+                        </a>
+                        <button onclick="copyLink()" class="btn-share copy" style="border: none; cursor: pointer;">
+                            <i class="fa-solid fa-link"></i> Salin Tautan
+                        </button>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Error State (404) -->
+            <div id="error-state" style="display: none; text-align: center; padding: 100px 20px;">
+                <i class="fa-solid fa-file-circle-xmark fa-4x" style="color: #cbd5e1; margin-bottom: 20px;"></i>
+                <h2 style="color: #0f172a; margin-bottom: 10px;">Berita Tidak Ditemukan</h2>
+                <p style="color: #64748b; margin-bottom: 30px;">Artikel yang Anda cari mungkin sudah dihapus, diturunkan (draft), atau tautan salah.</p>
+                <a href="/berita.html" style="background: var(--primary-color); color: white; padding: 12px 24px; border-radius: 30px; text-decoration: none; font-weight: 600;">Lihat Berita Lainnya</a>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- Footer Placeholder -->
+    <div id="footer-placeholder"></div>
+
+    <script src="/js/main.js"></script>
+    <script src="/js/global-settings.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            // 1. Ambil URL Slug dari Query Parameter
+            const urlParams = new URLSearchParams(window.location.search);
+            const slug = urlParams.get('slug');
+
+            const loadingState = document.getElementById('loading-state');
+            const articleState = document.getElementById('article-content-ready');
+            const errorState = document.getElementById('error-state');
+
+            // Jika tidak ada slug di URL, lemparkan kembali ke halaman daftar berita
+            if (!slug) {
+                window.location.href = '/berita.html';
+                return;
+            }
+
+            try {
+                // 2. Fetch Data ke Backend API berdasarkan Slug
+                const res = await fetch(`/api/berita/${slug}`);
+                const result = await res.json();
+
+                if (result.success && result.data) {
+                    const berita = result.data;
+                    
+                    // Format Tanggal
+                    const d = new Date(berita.created_at);
+                    const tglFormat = d.toLocaleDateString('id-ID', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+
+                    // Ganti Judul Tab Browser
+                    document.title = `${berita.judul} - Yayasan Al-Hidayah Amansari`;
+
+                    // Suntikkan Data ke DOM
+                    document.getElementById('view-kategori').innerText = berita.kategori;
+                    document.getElementById('view-judul').innerText = berita.judul;
+                    document.getElementById('view-tanggal').innerText = tglFormat;
+                    document.getElementById('view-penulis').innerText = berita.penulis;
+                    document.getElementById('view-cover').src = berita.foto_cover;
+                    
+                    // Suntikkan konten HTML murni dari Quill
+                    document.getElementById('view-konten').innerHTML = berita.konten;
+
+                    // Siapkan Link Tombol Share
+                    const currentUrl = window.location.href;
+                    const shareText = encodeURIComponent(`*${berita.judul}*\n\nBaca selengkapnya di: ${currentUrl}`);
+                    
+                    document.getElementById('share-wa').href = `https://api.whatsapp.com/send?text=${shareText}`;
+                    document.getElementById('share-fb').href = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(currentUrl)}`;
+
+                    // Sembunyikan Loading, Tampilkan Artikel
+                    loadingState.style.display = 'none';
+                    articleState.style.display = 'block';
+
+                } else {
+                    // Berita tidak ada atau berstatus Pending
+                    document.title = "Tidak Ditemukan - Yayasan Al-Hidayah";
+                    loadingState.style.display = 'none';
+                    errorState.style.display = 'block';
+                }
+
+            } catch (error) {
+                console.error("Gagal memuat detail berita:", error);
+                loadingState.style.display = 'none';
+                errorState.style.display = 'block';
+                errorState.querySelector('h2').innerText = "Gagal Terhubung ke Server";
+                errorState.querySelector('p').innerText = "Mohon periksa koneksi internet Anda dan coba muat ulang halaman.";
+            }
+        });
+
+        // Fungsi Salin Tautan (Copy Link)
+        function copyLink() {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                alert("Tautan berita berhasil disalin ke clipboard!");
+            }).catch(err => {
+                console.error('Gagal menyalin:', err);
+            });
+        }
+    </script>
+</body>
+</html>

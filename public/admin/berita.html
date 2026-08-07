@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Berita & Publikasi - CMS Yayasan</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    
+    <style>
+        body { margin: 0; font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f1f5f9; display: flex; overflow-x: hidden; }
+        #sidebar-container { position: fixed; top: 0; left: 0; z-index: 40; transition: transform 0.3s; }
+        #main-content { margin-left: 260px; padding: 40px; width: calc(100% - 260px); box-sizing: border-box; min-height: 100vh; }
+        
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .header h1 { margin: 0; font-size: 1.8rem; color: #0f172a; }
+        
+        .card { background: white; padding: 25px; border-radius: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); margin-bottom: 30px; }
+        .card-header { font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e2e8f0; display: flex; align-items: center; gap: 10px; }
+
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 700; color: #64748b; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px;}
+        .form-group input, .form-group select { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-family: inherit; font-size: 0.95rem; box-sizing: border-box; transition: 0.3s; }
+        
+        #editor-container { height: 350px; background: #fff; border-radius: 0 0 8px 8px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1rem; }
+        .ql-toolbar.ql-snow { border-radius: 8px 8px 0 0; background: #f8fafc; border-color: #cbd5e1; }
+        .ql-container.ql-snow { border-color: #cbd5e1; border-radius: 0 0 8px 8px; }
+
+        .btn-submit { background: #3b82f6; color: white; border: none; padding: 14px 24px; border-radius: 8px; font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; margin-top: 20px; transition: 0.2s; }
+        .btn-submit.btn-edit-mode { background: #f59e0b; }
+        
+        /* Table Styles */
+        .table-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        th { text-align: left; padding: 15px; background: #f8fafc; color: #64748b; font-size: 0.85rem; text-transform: uppercase; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 15px; border-bottom: 1px solid #e2e8f0; color: #334155; font-size: 0.95rem; vertical-align: middle; }
+        
+        .news-thumb { width: 100px; height: 70px; object-fit: cover; border-radius: 6px; border: 1px solid #cbd5e1; background: #f1f5f9; }
+        
+        .badge { padding: 4px 10px; border-radius: 12px; font-size: 0.75rem; font-weight: 700; color: white; display: inline-block;}
+        .bg-pending { background: #f59e0b; }
+        .bg-publish { background: #10b981; }
+
+        .action-btns { display: flex; gap: 8px; }
+        .btn-icon { color: white; border: none; padding: 8px; border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; transition: 0.2s; }
+        .btn-icon.edit { background: #3b82f6; }
+        .btn-icon.publish { background: #10b981; }
+        .btn-icon.draft { background: #64748b; }
+        .btn-icon.delete { background: #ef4444; }
+
+        @media (max-width: 768px) {
+            #main-content { margin-left: 0; width: 100%; padding: 20px; padding-bottom: 100px; }
+            #sidebar-container { transform: translateX(-100%); }
+            #sidebar-container.show-sidebar { transform: translateX(0); }
+            .form-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar-container"></div>
+
+    <main id="main-content">
+        <div class="header">
+            <div>
+                <h1>Kelola Berita & Publikasi</h1>
+                <p style="color: #64748b; margin-top: 5px;">Sistem redaksi (Tulis, Review, Publish).</p>
+            </div>
+        </div>
+
+        <!-- FORM TULIS / EDIT BERITA -->
+        <div class="card" id="formCard">
+            <div class="card-header" id="formTitle"><i class="ph-bold ph-newspaper" style="color: #3b82f6;"></i> Tulis Berita Baru</div>
+            <form id="formBerita">
+                <input type="hidden" id="berita_id" value=""> <!-- Hidden ID untuk mode Edit -->
+                <div class="form-grid">
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label>Judul Berita</label>
+                        <input type="text" id="judul" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Kategori</label>
+                        <select id="kategori" required>
+                            <option value="SD IT">Kabar SD IT</option>
+                            <option value="PAUD">Kabar PAUD</option>
+                            <option value="Prestasi">Prestasi & Penghargaan</option>
+                            <option value="Kegiatan">Kegiatan Sekolah</option>
+                            <option value="Pengumuman">Pengumuman Resmi</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Foto Cover <span id="cover-hint" style="font-weight:normal; font-size:0.8rem; color:#f59e0b;">(Wajib diunggah)</span></label>
+                        <input type="file" id="foto_cover" accept="image/*" style="padding: 9px;" required>
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-top: 10px;">
+                    <label>Isi Berita (Konten)</label>
+                    <div id="editor-container"></div>
+                </div>
+
+                <div style="display: flex; gap: 15px;">
+                    <button type="submit" id="btnSubmitBerita" class="btn-submit">
+                        <i class="ph-bold ph-floppy-disk"></i> Simpan ke Draft (Pending)
+                    </button>
+                    <button type="button" id="btnBatalEdit" class="btn-submit" style="background: #64748b; display: none;" onclick="resetForm()">
+                        Batal Edit
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- TABEL DAFTAR BERITA -->
+        <div class="card">
+            <div class="card-header"><i class="ph-bold ph-list-dashes" style="color: #10b981;"></i> Daftar Artikel (Redaksi)</div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Cover</th>
+                            <th>Judul & Info</th>
+                            <th>Kategori</th>
+                            <th>Status</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBodyBerita">
+                        <tr><td colspan="5" style="text-align: center; color: #64748b;">Memuat data berita...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        const token = localStorage.getItem('cms_token');
+        if (!token) window.location.href = '/admin/login.html';
+
+        const cmsUserStr = localStorage.getItem('cms_user');
+        let namaPenulis = "Admin Yayasan";
+        if (cmsUserStr) {
+            try { const userObj = JSON.parse(cmsUserStr); if (userObj.full_name) namaPenulis = userObj.full_name; } catch(e) {}
+        }
+
+        fetch('/admin/components/sidebar.html')
+            .then(res => res.text())
+            .then(data => { if (!data.includes('<html')) document.getElementById('sidebar-container').innerHTML = data; });
+
+        var quill = new Quill('#editor-container', {
+            theme: 'snow',
+            placeholder: 'Tulis isi artikel berita selengkapnya di sini...',
+            modules: { toolbar: [ [{ 'header': [2, 3, false] }], ['bold', 'italic', 'underline'], [{ 'list': 'ordered'}, { 'list': 'bullet' }], ['link', 'image'], ['clean'] ] }
+        });
+
+        // ==========================================
+        // 1. LOAD DATA BERITA
+        // ==========================================
+        let globalBeritaData = []; // Simpan data sementara untuk Edit
+
+        async function loadBerita() {
+            try {
+                const res = await fetch('/api/admin/berita', { headers: { 'Authorization': `Bearer ${token}` } });
+                const result = await res.json();
+                const tbody = document.getElementById('tableBodyBerita');
+                tbody.innerHTML = '';
+
+                if (result.success && result.data.length > 0) {
+                    globalBeritaData = result.data; // Simpan ke array global
+
+                    result.data.forEach(berita => {
+                        const statusBadge = berita.status === 'Publish' 
+                            ? '<span class="badge bg-publish">Dipublikasi</span>' 
+                            : '<span class="badge bg-pending">Pending Review</span>';
+
+                        const publishBtn = berita.status === 'Publish'
+                            ? `<button onclick="ubahStatus(${berita.id}, 'Pending')" class="btn-icon draft" title="Tarik ke Draft"><i class="ph-bold ph-x-circle"></i></button>`
+                            : `<button onclick="ubahStatus(${berita.id}, 'Publish')" class="btn-icon publish" title="Publish Sekarang!"><i class="ph-bold ph-check-circle"></i></button>`;
+
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td><img src="${berita.foto_cover}" class="news-thumb"></td>
+                            <td>
+                                <strong style="color: #0f172a; display: block;">${berita.judul}</strong>
+                                <span style="font-size: 0.75rem; color: #64748b;">Penulis: ${berita.penulis}</span>
+                            </td>
+                            <td><strong>${berita.kategori}</strong></td>
+                            <td>${statusBadge}</td>
+                            <td>
+                                <div class="action-btns">
+                                    <button onclick="editBerita(${berita.id})" class="btn-icon edit" title="Review & Edit"><i class="ph-bold ph-pencil-simple"></i></button>
+                                    ${publishBtn}
+                                    <button onclick="deleteBerita(${berita.id})" class="btn-icon delete" title="Hapus"><i class="ph-bold ph-trash"></i></button>
+                                </div>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } else {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #64748b;">Belum ada berita.</td></tr>';
+                }
+            } catch (err) { console.error("Error:", err); }
+        }
+
+        // ==========================================
+        // 2. MASUK MODE REVIEW & EDIT
+        // ==========================================
+        function editBerita(id) {
+            const berita = globalBeritaData.find(b => b.id === id);
+            if (!berita) return;
+
+            // Pindahkan data ke Form
+            document.getElementById('berita_id').value = berita.id;
+            document.getElementById('judul').value = berita.judul;
+            document.getElementById('kategori').value = berita.kategori;
+            quill.root.innerHTML = berita.konten; // Masukkan konten ke Editor
+
+            // Ubah UI Form menjadi Mode Edit
+            document.getElementById('formTitle').innerHTML = `<i class="ph-bold ph-pencil-simple" style="color: #f59e0b;"></i> Review & Edit Berita`;
+            const btnSubmit = document.getElementById('btnSubmitBerita');
+            btnSubmit.innerHTML = '<i class="ph-bold ph-check"></i> Simpan Perubahan Edit';
+            btnSubmit.classList.add('btn-edit-mode');
+            
+            // Foto tidak wajib jika hanya edit teks
+            const inputFoto = document.getElementById('foto_cover');
+            inputFoto.removeAttribute('required');
+            document.getElementById('cover-hint').innerText = "(Kosongkan jika tidak ingin mengubah foto)";
+            
+            document.getElementById('btnBatalEdit').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' }); // Gulir ke atas
+        }
+
+        function resetForm() {
+            document.getElementById('formBerita').reset();
+            document.getElementById('berita_id').value = '';
+            quill.setContents([]);
+            
+            document.getElementById('formTitle').innerHTML = `<i class="ph-bold ph-newspaper" style="color: #3b82f6;"></i> Tulis Berita Baru`;
+            const btnSubmit = document.getElementById('btnSubmitBerita');
+            btnSubmit.innerHTML = '<i class="ph-bold ph-floppy-disk"></i> Simpan ke Draft (Pending)';
+            btnSubmit.classList.remove('btn-edit-mode');
+            
+            document.getElementById('foto_cover').setAttribute('required', 'true');
+            document.getElementById('cover-hint').innerText = "(Wajib diunggah)";
+            document.getElementById('btnBatalEdit').style.display = 'none';
+        }
+
+        // ==========================================
+        // 3. SUBMIT (CREATE ATAU UPDATE)
+        // ==========================================
+        document.getElementById('formBerita').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const kontenHTML = quill.root.innerHTML;
+            if (quill.getText().trim().length === 0) return alert("Isi berita kosong!");
+
+            const btnSubmit = document.getElementById('btnSubmitBerita');
+            btnSubmit.innerHTML = '<i class="ph-bold ph-spinner ph-spin"></i> Memproses...';
+            btnSubmit.disabled = true;
+
+            const editId = document.getElementById('berita_id').value;
+            const formData = new FormData();
+            formData.append('judul', document.getElementById('judul').value);
+            formData.append('kategori', document.getElementById('kategori').value);
+            formData.append('konten', kontenHTML);
+            
+            if (document.getElementById('foto_cover').files[0]) {
+                formData.append('foto_cover', document.getElementById('foto_cover').files[0]);
+            }
+
+            try {
+                let apiUrl = '/api/admin/berita';
+                let method = 'POST';
+
+                if (editId) {
+                    apiUrl = `/api/admin/berita/${editId}`;
+                    method = 'PUT';
+                } else {
+                    formData.append('penulis', namaPenulis);
+                }
+
+                const res = await fetch(apiUrl, {
+                    method: method, headers: { 'Authorization': `Bearer ${token}` }, body: formData
+                });
+                
+                const result = await res.json();
+                if (result.success) {
+                    alert('Berhasil!');
+                    resetForm();
+                    loadBerita();
+                } else alert('Gagal: ' + result.pesan);
+            } catch (err) { alert('Terjadi kesalahan sistem.'); } 
+            finally { btnSubmit.disabled = false; resetForm(); }
+        });
+
+        // ==========================================
+        // 4. UBAH STATUS (PUBLISH/PENDING)
+        // ==========================================
+        async function ubahStatus(id, statusBaru) {
+            if (!confirm(`Yakin ingin mengubah status berita ini menjadi ${statusBaru}?`)) return;
+            try {
+                const res = await fetch(`/api/admin/berita/${id}/status`, {
+                    method: 'PUT',
+                    headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status: statusBaru })
+                });
+                const result = await res.json();
+                if (result.success) loadBerita();
+            } catch (err) { alert("Terjadi kesalahan sistem."); }
+        }
+
+        // ==========================================
+        // 5. HAPUS BERITA
+        // ==========================================
+        async function deleteBerita(id) {
+            if (!confirm('Hapus permanen berita ini?')) return;
+            try {
+                const res = await fetch(`/api/admin/berita/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+                const result = await res.json();
+                if (result.success) loadBerita();
+            } catch (err) { alert('Terjadi kesalahan pada server.'); }
+        }
+
+        loadBerita();
+    </script>
+</body>
+</html>
